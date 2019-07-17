@@ -1,0 +1,24 @@
+{
+    "Body": {
+        "CreationTime": "2019-06-07T14:32:44.7077501Z",
+        "IpcNode": "WRAPLINE",
+        "MessageToRequeueOid": null,
+        "SignalCode": "RWR2_ID_RSP",
+        "SignalData": {
+		"ProcessCode":"TE-RWR2",
+		"ItemCode":"0TE1900000012744",
+		"StationSequenceNumber":"1",
+		"TransactionResult":"True"
+        },
+        "SignalServiceNode": "WRAPLINE_IPC_NODE",
+        "SkipReceiverRetry": true
+    },
+    "Header": {
+        "SenderApplicationCode": "Pts.Common",
+        "SignalServiceNode": "WINDERS_IPC_NODE",
+        "TixUserId": "paverjit",
+        "TransactionId": "WS--8585a161-bccf-479e-9e7a-78f2149e5977"
+    },
+    "MsgId": "93cc11c9-3d6c-41e6-b5ee-a74c1e0ba2a4",
+    "Type": "Tips.Base.Messages.Base.ToIpc.ToIpcMessage:Tips.Base.Messages.Base"
+}

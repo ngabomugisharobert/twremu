@@ -1,0 +1,43 @@
+{
+    "Body": {
+        "Command": {
+            "CommandCode": "WRAPLINE_IDENTIFY_W",
+            "CommandDescription": "Wrapline identification of unit",
+            "CommandType": "Workflow",
+            "IBY": "gavelfil",
+            "IDATE": "2018-03-06T12:06:34Z",
+            "MethodName": null,
+            "OID": "phobospkg-1520344676-80005",
+            "UBY": "gavelfil",
+            "UCNT": 0,
+            "UDATE": "2018-03-06T12:06:34Z",
+            "WorkflowCode": "Pts.Common.Web.Ipc.OnIncomingMessage",
+            "WorkflowVersionCode": "WRAPLINE_IDENTIFY"
+        },
+        "CreationTime": "2019-06-04T12:10:32.4272675Z",
+        "DriverRequestAnswers": {},
+        "IpcNode": null,
+        "ProcessCode": "TE-RWR2",
+        "SignalBody": {
+            "ProcessCode": "TE-RWR2",
+            "ItemCode": "1TE1900000012744",
+            "StationSequenceNumber": 1,
+	    "ResponseSignalCode": "RWR2_ID_RSP"
+        },
+        "SignalCode": "RWR2_ID",
+        "SignalServiceNode": "WRAPLINE_IPC_NODE",
+        "SignalTime": "0001-01-01T00:00:00",
+        "SkipReceiverRetry": true,
+        "UtcTimeStamp": 1559650232,
+        "WorkflowDynamics": {},
+        "WorkstationCode": "WS-RWR2"
+    },
+    "Header": {
+        "SenderApplicationCode": "Tips.Base.IpcSignal.IpcSignalService",
+        "TixUserId": "tipseng",
+        "TransactionId": "WS--d4504b73-733f-463b-85c4-ab15a33fbaaa",
+        "WorkstationCode": "WS-RWR2"
+    },
+    "MsgId": "aaaae374-042b-42cf-99ab-e88136cd9bdc",
+    "Type": "Tips.Base.Messages.Base.FromIpc.IpcToPtsMessage:Tips.Base.Messages.Base"
+}
