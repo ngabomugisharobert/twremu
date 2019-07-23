@@ -138,7 +138,6 @@ def callback(ch, method, properties, body):
 	global situation
 
 	print("callback")
-	print(body)
 	reply=json.loads(body)
 	print("\n")
 	print(reply)
