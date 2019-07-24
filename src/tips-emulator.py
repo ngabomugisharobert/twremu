@@ -7,7 +7,7 @@ import queue
 mq_connect='localhost'
 
 situation=[]
-
+count = 1
 print('Tips-Wrapline-Emulator starting')
 print('Connecting to RabbitMQ')
 
@@ -78,11 +78,12 @@ def init_msg(itemCode,seqNbr,result):
 	print("--------------------------------------------------")
 
 
-def error_msg(itemCode,seqNbr):
+def error_msg(itemCode,seqNbr,mes=""):
 
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	print("no unit item can overtake other or two unit items in 1 station ata the same time")
-	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	if mes != "":
+    		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n"+ str(mes) + " \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	elif mes == "":
+			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	init_msg(itemCode,seqNbr,False)
 	sys.exit()
 
@@ -90,13 +91,63 @@ def error_msg(itemCode,seqNbr):
 
 def business_rules(signalCode, itemCode, sequenceNumber,situation):
 	global sys
+	global count
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
 	match2 = next((y for y in situation if y["StationSequenceNumber"] == sequenceNumber), None)
 
+#1st rule checking
+	ms = "the Station is already occupied"
 	for a in situation:
-    		if a["StationSequenceNumber"]== sequenceNumber:
-    				error_msg(itemCode,sequenceNumber)
-    				sys.exit()
+    		if a["StationSequenceNumber"]== sequenceNumber and a["StationSequenceNumber"]!= 5:
+    				error_msg(itemCode,sequenceNumber,ms)
+    	#			sys.exit()
+
+
+#2nd rule checking
+
+	ms = " this item has signalCode that does not match the station, something is wrong here."
+	if signalCode[5:] == 'ID' and sequenceNumber == 1:
+    		print(" ACCEPTED ",signalCode," to STATION ID")
+	elif signalCode[5:] == 'ME' and sequenceNumber == 2:
+    		print(" ACCEPTED ",signalCode," to STATION ME")
+	elif signalCode[5:] == 'WR' and sequenceNumber == 3:
+    		print(" ACCEPTED ",signalCode," to STATION WR")
+	elif signalCode[5:] == 'MO' and sequenceNumber == 4:
+    		print(" ACCEPTED ",signalCode," to STATION MO")
+	elif signalCode[5:] == 'MO' and sequenceNumber == 5:
+    		print(" ACCEPTED ",signalCode," to STATION MO")
+	else:
+    		error_msg(itemCode,sequenceNumber,ms)
+
+#3rd rule checking
+	Situation_json = json.dumps(situation)
+	print(Situation_json)
+
+	if not situation:
+    		print("")
+	elif  any(sequenceNumber for d in situation):
+    		print("")
+	else:
+    		error_msg(itemCode,sequenceNumber)
+#4th rule
+	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
+	if signalCode[5:] == 'ID' and itemCode in situation:
+			error_msg(itemCode,sequenceNumber,ms)
+
+#5th rule
+
+	ms ="this unit Item : ",itemCode," is in a Queue"
+	if signalCode[5:] != 'ID' and not any(itemCode for d in situation):
+			error_msg(itemCode,sequenceNumber,ms)
+
+#6th rule
+
+
+	if sequenceNumber == 5:
+    		count=count+1
+	if count == 5:
+    		error_msg(itemCode,sequenceNumber,"all Unit Item has reached the exit station")
+
 
 	###  B U S I N E S S - R U L E S -  P E R F O R M E D
 	################################################################
@@ -120,9 +171,6 @@ def callback(ch, method, properties, body):
 	kickOutFlag="False"
 	if "KickOutFlag" in msg["SignalBody"]:
 		kickOutFlag=msg["SignalBody"]["KickOutFlag"]
-		print(" all unit items has reached exit ")
-		sys.exit()
-		print("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
 
 
 
