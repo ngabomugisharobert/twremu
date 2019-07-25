@@ -89,7 +89,7 @@ def error_msg(itemCode,seqNbr,mes=""):
 
 
 
-def business_rules(signalCode, itemCode, sequenceNumber,situation):
+def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	global sys
 	global count
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
@@ -100,7 +100,6 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation):
 	for a in situation:
     		if a["StationSequenceNumber"]== sequenceNumber and a["StationSequenceNumber"]!= 5:
     				error_msg(itemCode,sequenceNumber,ms)
-    	#			sys.exit()
 
 
 #2nd rule checking
@@ -119,16 +118,17 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation):
 	else:
     		error_msg(itemCode,sequenceNumber,ms)
 
-#3rd rule checking
-	Situation_json = json.dumps(situation)
-	print(Situation_json)
+#3rd rule checking    -------------->>>>> this was duplicate, it was checking if the next station is not occupied
+	#Situation_json = json.dumps(situation)
+	#print(Situation_json)
 
-	if not situation:
-    		print("")
-	elif  any(sequenceNumber for d in situation):
-    		print("")
-	else:
-    		error_msg(itemCode,sequenceNumber)
+	#if not situation:
+	#		print("")
+	#elif  any(sequenceNumber for d in situation):
+	#		print("")
+	#else:
+	#		error_msg(itemCode,sequenceNumber)
+
 #4th rule
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
 	if signalCode[5:] == 'ID' and itemCode in situation:
@@ -136,17 +136,17 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation):
 
 #5th rule
 
-	ms ="this unit Item : ",itemCode," is in a Queue"
+	ms ="this unit Item : ",itemCode," is not in a Queue"
 	if signalCode[5:] != 'ID' and not any(itemCode for d in situation):
 			error_msg(itemCode,sequenceNumber,ms)
 
 #6th rule
 
+	ms= "There is a Unit Item that is moving to exit whithout KickOutFlag setted to true"
+	if "KickOutFlag" in msg_received["SignalBody"] and msg_received["SignalBody"]["KickOutFlag"] != 'True' :
+			error_msg(itemCode,sequenceNumber,ms)
 
-	if sequenceNumber == 5:
-    		count=count+1
-	if count == 5:
-    		error_msg(itemCode,sequenceNumber,"all Unit Item has reached the exit station")
+
 
 
 	###  B U S I N E S S - R U L E S -  P E R F O R M E D
@@ -180,7 +180,7 @@ def callback(ch, method, properties, body):
 #	write fake tester script that will send the message with error and add a reply message containing the transaction code = to fals
 
 	print("--------------------------------------------------------------- \n")
-	business_rules(signalCode,itemCode,seqNbr,situation)
+	business_rules(signalCode,itemCode,seqNbr,situation,msg)
 
 	print("--------------------------------------------------------------- \n")
 
