@@ -147,7 +147,10 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 			error_msg(itemCode,sequenceNumber,ms)
 
 
-
+#7th rule for exit if all item are in exit station
+	ms = " all Unit item reached the exit station"
+	if "SignalBody" not in msg_received:
+    		error_msg(itemCode,sequenceNumber,ms)
 
 	###  B U S I N E S S - R U L E S -  P E R F O R M E D
 	################################################################
@@ -165,6 +168,11 @@ def callback(ch, method, properties, body):
 	global channel
 	global situation
 	msg=json.loads(body)
+	ms = " all Unit item reached the exit station"
+	if "SignalBody" not in msg:
+
+			print(ms)
+			sys.exit()
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
