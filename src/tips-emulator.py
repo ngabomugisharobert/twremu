@@ -118,17 +118,6 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	else:
     		error_msg(itemCode,sequenceNumber,ms)
 
-#3rd rule checking    -------------->>>>> this was duplicate, it was checking if the next station is not occupied
-	#Situation_json = json.dumps(situation)
-	#print(Situation_json)
-
-	#if not situation:
-	#		print("")
-	#elif  any(sequenceNumber for d in situation):
-	#		print("")
-	#else:
-	#		error_msg(itemCode,sequenceNumber)
-
 #4th rule
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
 	if signalCode[5:] == 'ID' and itemCode in situation:
@@ -142,10 +131,9 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 
 #6th rule
 
-	ms= "There is a Unit Item that is moving to exit whithout KickOutFlag setted to true"
-	if "KickOutFlag" in msg_received["SignalBody"] and msg_received["SignalBody"]["KickOutFlag"] != 'True' :
-			error_msg(itemCode,sequenceNumber,ms)
-
+	ms= "this item :", itemCode , " has reached to exit station"
+	if "KickOutFlag" in msg_received["SignalBody"] and msg_received["SignalBody"]["KickOutFlag"] == 'True' :
+			print(ms)
 
 #7th rule for exit if all item are in exit station
 	ms = " all Unit item reached the exit station"
@@ -168,7 +156,7 @@ def callback(ch, method, properties, body):
 	global channel
 	global situation
 	msg=json.loads(body)
-	ms = " all Unit item reached the exit station"
+	ms = "malformed message. No SignalBody"
 	if "SignalBody" not in msg:
 
 			print(ms)
