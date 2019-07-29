@@ -3,6 +3,8 @@ import sys
 import json
 import time
 import queue
+import string
+import random
 
 mq_connect='localhost'
 
@@ -32,8 +34,12 @@ channel.queue_bind(exchange='Base.FromIpc.IpcToPts', queue='tips-emulator')
 
 print('Defining business rules function')
 
+def id_generator(size=15, chars=string.ascii_letters + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
 
-def init_msg(itemCode,seqNbr,result):
+
+
+def init_msg(itemCode ="",seqNbr="",result=""):
 
 	file = open("sample_reply.json", "r")
 	rawmsg = file.read()
@@ -62,11 +68,12 @@ def init_msg(itemCode,seqNbr,result):
 	props = pika.spec.BasicProperties(headers=hdr,
 		delivery_mode=2,
 		correlation_id=mqmsgid,
-		message_id=mqmsgid,
+		message_id= id_generator(),
 		type=msgtype)
 	key = msgtype.split(':')[0]
 	key = key.replace('Tips.Base.Messages.', '')
 	key = key.replace('Message', '')
+
 
 	channel.basic_publish(exchange='(TIX Hub)',
 						routing_key=key,
@@ -84,6 +91,7 @@ def error_msg(itemCode,seqNbr,mes=""):
     		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n"+ str(mes) + " \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	elif mes == "":
 			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+#	time.sleep(2)
 	init_msg(itemCode,seqNbr,False)
 	sys.exit()
 
@@ -135,10 +143,6 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	if "KickOutFlag" in msg_received["SignalBody"] and msg_received["SignalBody"]["KickOutFlag"] == 'True' :
 			print(ms)
 
-#7th rule for exit if all item are in exit station
-	ms = " all Unit item reached the exit station"
-	if "SignalBody" not in msg_received:
-    		error_msg(itemCode,sequenceNumber,ms)
 
 	###  B U S I N E S S - R U L E S -  P E R F O R M E D
 	################################################################
@@ -157,10 +161,10 @@ def callback(ch, method, properties, body):
 	global situation
 	msg=json.loads(body)
 	ms = "malformed message. No SignalBody"
-	if "SignalBody" not in msg:
+	if "SignalBody" not in msg:return
 
-			print(ms)
-			sys.exit()
+	#		init_msg
+		#	sys.exit()
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
@@ -202,8 +206,8 @@ def callback(ch, method, properties, body):
 	print(output)
 	print()
 
-	time.sleep(2)
 
+	time.sleep(2)
 	init_msg(itemCode,seqNbr,True)
 print('Receiver starting')
 print(' [*] Waiting for messages. To exit press CTRL+C')

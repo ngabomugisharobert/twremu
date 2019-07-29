@@ -1,6 +1,7 @@
 import pika
 import sys
 import json
+import time
 
 # define globals
 mq_connect='localhost'
@@ -91,7 +92,6 @@ def forward(x, nextSeqNbr):
 	key = key.replace('Message', '')
 
 	print('sending')
-
 	channel.basic_publish(exchange='(TIX Hub)',
                       routing_key=key,
                       body=json.dumps(msgdtl),
@@ -104,6 +104,7 @@ def forward(x, nextSeqNbr):
 	if kickOutFlag==True:
 		print("kickout!!")
 		situation.remove(match)
+	return None
 
 def nextStep():
 	global situation
@@ -132,6 +133,8 @@ def nextStep():
 		if match is None:
 			forward(i, nextSeqNbr)
 			break
+		#return None
+
 
 def callback(ch, method, properties, body):
 	global channel
@@ -140,7 +143,12 @@ def callback(ch, method, properties, body):
 	print("callback")
 	reply=json.loads(body)
 	print("\n")
+	print("the reply from emulator")
+	print("*******************************************************************************************************")
 	print(reply)
+	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	if "SignalBody" not in reply:return
+
 	print("\n")
 	signalCode=reply["SignalCode"]
 	itemCode=reply["SignalBody"]["ItemCode"]
@@ -151,8 +159,8 @@ def callback(ch, method, properties, body):
 	nextStep()
 
 	# check for exit
-	if not situation:
-		sys.exit()
+	if not situation:return
+		#sys.exit()
 
 # Start of initialization
 print('Tips-Wrapline-Tester starting')
