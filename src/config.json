@@ -1,9 +1,9 @@
 {
-	"ItemCodes": 
+	"ItemCodes":
 	[
-		"0TE1900000013171",
-		"0TE1900000013172",
-		"0TE1900000013173",
-		"0TE1900000013174"
+		{"itemCode":"0TE1900000013171","ScalesNetWeight":160},
+		{"itemCode":"0TE1900000013172","ScalesNetWeight":190},
+		{"itemCode":"0TE1900000013173","ScalesNetWeight":140},
+		{"itemCode":"0TE1900000013174","ScalesNetWeight":170}
 	]
 }

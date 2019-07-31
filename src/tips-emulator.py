@@ -9,7 +9,6 @@ import random
 mq_connect='localhost'
 
 situation=[]
-count = 1
 print('Tips-Wrapline-Emulator starting')
 print('Connecting to RabbitMQ')
 
@@ -42,7 +41,7 @@ def id_generator(size=15, chars=string.ascii_letters + string.digits):
 
 
 
-def init_msg(itemCode ="",seqNbr="",result=""):
+def init_msg(itemCode,seqNbr,result,scalesNetWeight):
 
 	file = open("sample_reply.json", "r")
 	rawmsg = file.read()
@@ -58,6 +57,9 @@ def init_msg(itemCode ="",seqNbr="",result=""):
 	msgdtl["SignalData"]["TransactionResult"] = result
 	msgdtl["SignalData"]["ItemCode"] = itemCode
 	msgdtl["SignalData"]["StationSequenceNumber"] = seqNbr
+	if seqNbr == 2:
+
+        	msgdtl["SignalData"]["ScalesNetWeight"] = scalesNetWeight
 	hdr={}
 	if "SenderApplicationCode" in hdrs:
 		hdr["SenderApplicationCode"]=hdrs["SenderApplicationCode"]
@@ -84,7 +86,7 @@ def init_msg(itemCode ="",seqNbr="",result=""):
 			properties=props,
 			mandatory=False)
 
-	print('Replied: '+msgdtl["SignalCode"]+', ItemCode: '+msgdtl["SignalData"]["ItemCode"]+', Station: '+str(msgdtl["SignalData"]["StationSequenceNumber"])+', TransactionResult: '+str(msgdtl["SignalData"]["TransactionResult"]))
+	print('Replied: '+str(msgdtl["SignalCode"])+', ItemCode: '+str(msgdtl["SignalData"]["ItemCode"])+', Station: '+str(msgdtl["SignalData"]["StationSequenceNumber"])+', TransactionResult: '+str(msgdtl["SignalData"]["TransactionResult"]))
 	print("--------------------------------------------------")
 
 
@@ -95,14 +97,13 @@ def error_msg(itemCode,seqNbr,mes=""):
 	elif mes == "":
 			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 #	time.sleep(2)
-	init_msg(itemCode,seqNbr,False)
+	init_msg(itemCode,seqNbr,False,scalesNetWeight="")
 	sys.exit()
 
 
 
 def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	global sys
-	global count
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
 	match2 = next((y for y in situation if y["StationSequenceNumber"] == sequenceNumber), None)
 
@@ -163,21 +164,17 @@ def callback(ch, method, properties, body):
 	global channel
 	global situation
 	msg=json.loads(body)
-	ms = "malformed message. No SignalBody"
 	if "SignalBody" not in msg:return
 
-	#		init_msg
-		#	sys.exit()
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
+	scalesNetWeight=msg["SignalBody"]["ScalesNetWeight"]
 	kickOutFlag="False"
 	if "KickOutFlag" in msg["SignalBody"]:
-		kickOutFlag=msg["SignalBody"]["KickOutFlag"]
+    		kickOutFlag=msg["SignalBody"]["KickOutFlag"]
 
-
-
-	print('Received Message: '+signalCode+', ItemCode: '+itemCode+', Station: '+str(seqNbr))
+	print('Received Message: '+ str(signalCode) + ', ItemCode: ' + str(itemCode) + ', Station: ' + str(seqNbr) + ', ScalesNetWeight: ' + str(scalesNetWeight))
 
 #	call rules fnct to check if the incoming msg make sense SSN 1st msg from ID , 1 unit in 1 station, unit can't overtake another,
 #	write fake tester script that will send the message with error and add a reply message containing the transaction code = to fals
@@ -191,7 +188,7 @@ def callback(ch, method, properties, body):
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
 	if match != None:
 		situation.remove(match)
-	situation.append( { "ItemCode": itemCode, "StationSequenceNumber": seqNbr } )
+	situation.append( { "ItemCode": itemCode, "StationSequenceNumber": seqNbr, "ScalesNetWeight" : scalesNetWeight } )
 
 	if kickOutFlag=="True":
 		print("kickout!!")
@@ -211,7 +208,7 @@ def callback(ch, method, properties, body):
 
 
 	time.sleep(2)
-	init_msg(itemCode,seqNbr,True)
+	init_msg(itemCode,seqNbr,True,scalesNetWeight)
 print('Receiver starting')
 print(' [*] Waiting for messages. To exit press CTRL+C')
 

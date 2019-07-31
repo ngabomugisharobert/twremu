@@ -20,7 +20,7 @@ def start():
 	config = json.loads(rawConfig)
 	itemCodes=config["ItemCodes"]
 	for itemCode in itemCodes:
-		situation.append( { "ItemCode": itemCode, "StationSequenceNumber": None } )
+		situation.append( { "ItemCode": itemCode['itemCode'], "StationSequenceNumber": None, "ScalesNetWeight": itemCode["ScalesNetWeight"] } )
 
 	# Send first message
 	nextStep()
@@ -31,6 +31,7 @@ def forward(x, nextSeqNbr):
 
 	signalCode=""
 	itemCode=x["ItemCode"]
+	scalesNetWeight = x["ScalesNetWeight"]
 	kickOutFlag=False
 
 	if nextSeqNbr==1:
@@ -66,6 +67,7 @@ def forward(x, nextSeqNbr):
 	msgdtl["SignalBody"]["ItemCode"]=itemCode
 	msgdtl["SignalBody"]["StationSequenceNumber"]=nextSeqNbr
 	msgdtl["SignalBody"]["ResponseSignalCode"]="TEST4"
+	msgdtl["SignalBody"]["ScalesNetWeight"]=scalesNetWeight
 	if kickOutFlag==True:
 		msgdtl["SignalBody"]["KickOutFlag"]="True"
 
@@ -152,6 +154,7 @@ def callback(ch, method, properties, body):
 	signalCode=reply["SignalCode"]
 	itemCode=reply["SignalData"]["ItemCode"]
 	seqNbr=reply["SignalData"]["StationSequenceNumber"]
+	#scalesNetWeight=reply["SignalData"]["ScalesNetWeight"]
 
 	# TODO Checks
 
