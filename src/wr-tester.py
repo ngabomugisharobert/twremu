@@ -134,8 +134,8 @@ def nextStep(check):
 		match = next((x for x in candidates if x["StationSequenceNumber"]==nextSeqNbr), None)
 		if match is None:
 			forward(i, nextSeqNbr)
-			break
-		#return None
+			return True
+	return False
 
 
 def callback(ch, method, properties, body):
@@ -159,6 +159,7 @@ def callback(ch, method, properties, body):
 	# TODO Checks
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 	nextStep()
 <<<<<<< Updated upstream
 =======
@@ -171,6 +172,11 @@ def callback(ch, method, properties, body):
 	# check for exit
 	if not situation:
 		channel.queue_purge(queue = queue)
+=======
+
+
+	if not nextStep():
+>>>>>>> Stashed changes
 		print("Work is done. Bye!")
 		check=False
 
