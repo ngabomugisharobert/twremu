@@ -147,20 +147,20 @@ def callback(ch, method, properties, body):
 	print("*******************************************************************************************************")
 	print(reply)
 	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	if "SignalBody" not in reply:return
 
 	print("\n")
 	signalCode=reply["SignalCode"]
-	itemCode=reply["SignalBody"]["ItemCode"]
-	seqNbr=reply["SignalBody"]["StationSequenceNumber"]
+	itemCode=reply["SignalData"]["ItemCode"]
+	seqNbr=reply["SignalData"]["StationSequenceNumber"]
 
 	# TODO Checks
 
 	nextStep()
 
 	# check for exit
-	if not situation:return
-		#sys.exit()
+	if not situation:
+		print("Work is done. Bye!")
+		return None
 
 # Start of initialization
 print('Tips-Wrapline-Tester starting')
@@ -169,9 +169,6 @@ print('Connecting to RabbitMQ')
 connection = pika.BlockingConnection(
     pika.ConnectionParameters(host=mq_connect))
 channel = connection.channel()
-
-print('Declaring exchange "(TIX Hub)"')
-channel.exchange_declare(exchange='(TIX Hub)', exchange_type='direct', durable=True)
 
 print('Declaring exchange "Base.ToIpc.ToIpc"')
 channel.exchange_declare(exchange='Base.ToIpc.ToIpc', exchange_type='fanout', durable=True)
