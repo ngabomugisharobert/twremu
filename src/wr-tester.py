@@ -156,8 +156,13 @@ def callback(ch, method, properties, body):
 	# TODO Checks
 
 	nextStep()
+<<<<<<< Updated upstream
+=======
+	queue="wr-tester"
+>>>>>>> Stashed changes
 	# check for exit
 	if not situation:
+		channel.queue_purge(queue = queue)
 		print("Work is done. Bye!")
 		sys.exit()
 
