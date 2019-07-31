@@ -156,7 +156,6 @@ def callback(ch, method, properties, body):
 	# TODO Checks
 
 	nextStep()
-
 	# check for exit
 	if not situation:
 		print("Work is done. Bye!")
