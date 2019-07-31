@@ -170,6 +170,9 @@ connection = pika.BlockingConnection(
     pika.ConnectionParameters(host=mq_connect))
 channel = connection.channel()
 
+print('Declaring exchange "(TIX Hub)"')
+channel.exchange_declare(exchange='(TIX Hub)', exchange_type='direct', durable=True)
+
 print('Declaring exchange "Base.ToIpc.ToIpc"')
 channel.exchange_declare(exchange='Base.ToIpc.ToIpc', exchange_type='fanout', durable=True)
 
