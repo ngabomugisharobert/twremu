@@ -147,20 +147,20 @@ def callback(ch, method, properties, body):
 	print("*******************************************************************************************************")
 	print(reply)
 	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	if "SignalBody" not in reply:return
 
 	print("\n")
 	signalCode=reply["SignalCode"]
-	itemCode=reply["SignalBody"]["ItemCode"]
-	seqNbr=reply["SignalBody"]["StationSequenceNumber"]
+	itemCode=reply["SignalData"]["ItemCode"]
+	seqNbr=reply["SignalData"]["StationSequenceNumber"]
 
 	# TODO Checks
 
 	nextStep()
 
 	# check for exit
-	if not situation:return
-		#sys.exit()
+	if not situation:
+		print("Work is done. Bye!")
+		sys.exit()
 
 # Start of initialization
 print('Tips-Wrapline-Tester starting')
