@@ -139,7 +139,6 @@ def nextStep():
 def callback(ch, method, properties, body):
 	global channel
 	global situation
-	global check
 
 	print("callback")
 	reply=json.loads(body)
