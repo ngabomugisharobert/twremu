@@ -6,7 +6,6 @@ import time
 # define globals
 mq_connect='localhost'
 situation=[]
-check = True
 
 def start():
 	global channel
@@ -24,7 +23,7 @@ def start():
 		situation.append( { "ItemCode": itemCode, "StationSequenceNumber": None } )
 
 	# Send first message
-	nextStep(check)
+	nextStep()
 
 def forward(x, nextSeqNbr):
 	global channel
@@ -107,9 +106,8 @@ def forward(x, nextSeqNbr):
 		situation.remove(match)
 	return None
 
-def nextStep(check):
+def nextStep():
 	global situation
-	if check == False:sys.exit()
 
 	# find highest possible entry candidate to the wrapping line
 	candidates=[]
@@ -158,27 +156,10 @@ def callback(ch, method, properties, body):
 
 	# TODO Checks
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-	nextStep()
-<<<<<<< Updated upstream
-=======
-	queue="wr-tester"
->>>>>>> Stashed changes
-=======
-	nextStep(check)
-
->>>>>>> Stashed changes
-	# check for exit
-	if not situation:
-		channel.queue_purge(queue = queue)
-=======
-
 
 	if not nextStep():
->>>>>>> Stashed changes
 		print("Work is done. Bye!")
-		check=False
+		sys.exit()
 
 # Start of initialization
 print('Tips-Wrapline-Tester starting')
