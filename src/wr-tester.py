@@ -11,14 +11,14 @@ def start():
 	global channel
 	global situation
 
-	# Read and parse the config.json
-	file = open("config.json", "r")
-	rawConfig = file.read()
+	# Read and parse the item.json
+	file = open("item.json", "r")
+	rawItem = file.read()
 	file.close()
 
 	# Initiate situation
-	config = json.loads(rawConfig)
-	itemCodes=config["ItemCodes"]
+	item = json.loads(rawItem)
+	itemCodes = item["ItemCodes"]
 	for item in itemCodes:
 		situation.append( { "ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"] } )
 
@@ -28,6 +28,16 @@ def start():
 def forward(x, nextSeqNbr):
 	global channel
 	global situation
+
+
+	# Read and parse the item.json
+	file2 = open("config.json", "r")
+	rawConf = file2.read()
+	file2.close()
+
+	# Initiate situation
+	stationProperties = json.loads(rawConf)
+
 
 	signalCode=""
 	itemCode=x["ItemCode"]
@@ -39,30 +49,55 @@ def forward(x, nextSeqNbr):
 	responseSignalCode=""
 
 	if nextSeqNbr==1:
+		stationProperties["Station"]["StationSequenceNumber"]=1
+		stationProperties["Station"]["StationName"]="identification"
+		stationProperties["Station"]["StationCode"]="RWR2_ID"
+		stationProperties["Station"]["IsScaling"]=False
+		stationProperties["Station"]["IsKickOut"]=False
 		signalCode="RWR2_ID"
 		commandCode="WRAPLINE_IDENTIFY_W"
 		commandDescription="Wrapline identification of unit"
 		workflowVersionCode="WRAPLINE_IDENTIFY"
 		responseSignalCode="RWR2_ID_RSP"
 	elif nextSeqNbr==2:
+		stationProperties["Station"]["StationSequenceNumber"]=2
+		stationProperties["Station"]["StationName"]="measurement"
+		stationProperties["Station"]["StationCode"]="RWR2_ME"
+		stationProperties["Station"]["IsScaling"]=True
+		stationProperties["Station"]["IsKickOut"]=False
 		signalCode="RWR2_ME"
 		commandCode="WRAPLINE_MEASURE_W"
 		commandDescription="Wrapline measure of unit"
 		workflowVersionCode="WRAPLINE_MEASURE"
 		responseSignalCode="RWR2_ME_RSP"
 	elif nextSeqNbr==3:
+		stationProperties["Station"]["StationSequenceNumber"]=3
+		stationProperties["Station"]["StationName"]="wrapping"
+		stationProperties["Station"]["StationCode"]="RWR2_WR"
+		stationProperties["Station"]["IsScaling"]=False
+		stationProperties["Station"]["IsKickOut"]=False
 		signalCode="RWR2_WR"
 		commandCode="WRAPLINE_WRAP_W"
 		commandDescription="Wrapline wrap of unit"
 		workflowVersionCode="WRAPLINE_WRAP"
 		responseSignalCode="RWR2_WR_RSP"
 	elif nextSeqNbr==4:
+		stationProperties["Station"]["StationSequenceNumber"]=4
+		stationProperties["Station"]["StationName"]="Exit"
+		stationProperties["Station"]["StationCode"]="RWR2_MO"
+		stationProperties["Station"]["IsScaling"]=False
+		stationProperties["Station"]["IsKickOut"]=False
 		signalCode="RWR2_MO"
 		commandCode="WRAPLINE_MOVE_W"
 		commandDescription="Wrapline label of unit"
 		workflowVersionCode="WRAPLINE_MOVE"
 		responseSignalCode="RWR2_MO_RSP"
 	elif nextSeqNbr==5:
+		stationProperties["Station"]["StationSequenceNumber"]=5
+		stationProperties["Station"]["StationName"]="Exit"
+		stationProperties["Station"]["StationCode"]="RWR2_MO"
+		stationProperties["Station"]["IsScaling"]=False
+		stationProperties["Station"]["IsKickOut"]=True
 		signalCode="RWR2_MO"
 		commandCode="WRAPLINE_MOVE_W"
 		commandDescription="Wrapline exit (move) of unit"
@@ -77,7 +112,6 @@ def forward(x, nextSeqNbr):
 	file = open("sample_message.json","r")
 	rawmsg=file.read()
 	file.close()
-
 	msg=json.loads(rawmsg)
 	hdrs=msg["Header"]
 	mqmsgid=msg["MsgId"]
@@ -116,6 +150,8 @@ def forward(x, nextSeqNbr):
 	key = msgtype.split(':')[0]
 	key = key.replace('Tips.Base.Messages.', '')
 	key = key.replace('Message', '')
+
+	msgdtl.update(stationProperties)
 
 	print('sending')
 	channel.basic_publish(exchange='(TIX Hub)',
