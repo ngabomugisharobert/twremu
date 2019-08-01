@@ -33,17 +33,41 @@ def forward(x, nextSeqNbr):
 	itemCode=x["ItemCode"]
 	scaledNetWeight = x["ScaledNetWeight"]
 	kickOutFlag=False
+	commandCode=""
+	commandDescription=""
+	workflowVersionCode=""	
+	responseSignalCode=""
 
 	if nextSeqNbr==1:
 		signalCode="RWR2_ID"
+		commandCode="WRAPLINE_IDENTIFY_W"
+		commandDescription="Wrapline identification of unit"
+		workflowVersionCode="WRAPLINE_IDENTIFY"
+		responseSignalCode="RWR2_ID_RSP"
 	elif nextSeqNbr==2:
 		signalCode="RWR2_ME"
+		commandCode="WRAPLINE_MEASURE_W"
+		commandDescription="Wrapline measure of unit"
+		workflowVersionCode="WRAPLINE_MEASURE"
+		responseSignalCode="RWR2_ME_RSP"
 	elif nextSeqNbr==3:
 		signalCode="RWR2_WR"
+		commandCode="WRAPLINE_WRAP_W"
+		commandDescription="Wrapline wrap of unit"
+		workflowVersionCode="WRAPLINE_WRAP"
+		responseSignalCode="RWR2_WR_RSP"
 	elif nextSeqNbr==4:
 		signalCode="RWR2_MO"
+		commandCode="WRAPLINE_MOVE_W"
+		commandDescription="Wrapline label of unit"
+		workflowVersionCode="WRAPLINE_MOVE"
+		responseSignalCode="RWR2_MO_RSP"
 	elif nextSeqNbr==5:
 		signalCode="RWR2_MO"
+		commandCode="WRAPLINE_MOVE_W"
+		commandDescription="Wrapline exit (move) of unit"
+		workflowVersionCode="WRAPLINE_MOVE"
+		responseSignalCode="RWR2_MO_RSP"
 		kickOutFlag=True
 	else:
 		print("nextSeqNbr invalid value")
@@ -61,12 +85,12 @@ def forward(x, nextSeqNbr):
 	msgdtl=msg["Body"]
 
 	# replace needed fields
-	msgdtl["Command"]["CommandCode"]="TEST"
-	msgdtl["Command"]["CommandDescription"]="TEST2"
-	msgdtl["Command"]["WorkflowVersionCode"]="TEST3"
+	msgdtl["Command"]["CommandCode"]=commandCode
+	msgdtl["Command"]["CommandDescription"]=commandDescription
+	msgdtl["Command"]["WorkflowVersionCode"]=workflowVersionCode
 	msgdtl["SignalBody"]["ItemCode"]=itemCode
 	msgdtl["SignalBody"]["StationSequenceNumber"]=nextSeqNbr
-	msgdtl["SignalBody"]["ResponseSignalCode"]="TEST4"
+	msgdtl["SignalBody"]["ResponseSignalCode"]=responseSignalCode
 	if nextSeqNbr == 2:msgdtl["SignalBody"]["ScaledNetWeight"]=scaledNetWeight
 	if kickOutFlag==True:
 		msgdtl["SignalBody"]["KickOutFlag"]="True"
