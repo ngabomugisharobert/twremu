@@ -35,7 +35,7 @@ def forward(x, nextSeqNbr):
 	kickOutFlag=False
 	commandCode=""
 	commandDescription=""
-	workflowVersionCode=""	
+	workflowVersionCode=""
 	responseSignalCode=""
 
 	if nextSeqNbr==1:
@@ -178,10 +178,7 @@ def callback(ch, method, properties, body):
 	signalCode=reply["SignalCode"]
 	itemCode=reply["SignalData"]["ItemCode"]
 	seqNbr=reply["SignalData"]["StationSequenceNumber"]
-
-	# TODO Checks
-
-
+# exit checking
 	if not nextStep():
 		print("Work is done. Bye!")
 		sys.exit()
