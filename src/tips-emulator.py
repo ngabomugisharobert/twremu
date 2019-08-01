@@ -220,7 +220,8 @@ def callback(ch, method, properties, body):
 	time.sleep(2)
 	if seqNbr == 2:
 		init_msg(itemCode, seqNbr, True,scaledNetWeight)
-	init_msg(itemCode,seqNbr,True)
+	else:
+		init_msg(itemCode,seqNbr,True)
 print('Receiver starting')
 print(' [*] Waiting for messages. To exit press CTRL+C')
 
