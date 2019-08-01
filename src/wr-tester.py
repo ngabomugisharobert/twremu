@@ -19,8 +19,8 @@ def start():
 	# Initiate situation
 	config = json.loads(rawConfig)
 	itemCodes=config["ItemCodes"]
-	for itemCode in itemCodes:
-		situation.append( { "ItemCode": itemCode, "StationSequenceNumber": None } )
+	for item in itemCodes:
+		situation.append( { "ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"] } )
 
 	# Send first message
 	nextStep()
@@ -31,6 +31,7 @@ def forward(x, nextSeqNbr):
 
 	signalCode=""
 	itemCode=x["ItemCode"]
+	scaledNetWeight = x["ScaledNetWeight"]
 	kickOutFlag=False
 	commandCode=""
 	commandDescription=""
@@ -90,6 +91,7 @@ def forward(x, nextSeqNbr):
 	msgdtl["SignalBody"]["ItemCode"]=itemCode
 	msgdtl["SignalBody"]["StationSequenceNumber"]=nextSeqNbr
 	msgdtl["SignalBody"]["ResponseSignalCode"]=responseSignalCode
+	if nextSeqNbr == 2:msgdtl["SignalBody"]["ScaledNetWeight"]=scaledNetWeight
 	if kickOutFlag==True:
 		msgdtl["SignalBody"]["KickOutFlag"]="True"
 
@@ -144,7 +146,7 @@ def nextStep():
 
 	# find first candidate that can be moved forward
 	for i in candidates:
-		print("i: "+str(i))
+		print("i: "+"itemCode: "+str(i["ItemCode"])+", StationSequenceNumber: "+str(i["StationSequenceNumber"]))
 		seqNbr=i["StationSequenceNumber"]
 		print("seqNbr: "+str(seqNbr))
 
