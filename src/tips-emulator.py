@@ -9,7 +9,6 @@ import random
 mq_connect='localhost'
 
 situation=[]
-count = 1
 print('Tips-Wrapline-Emulator starting')
 print('Connecting to RabbitMQ')
 
@@ -94,10 +93,10 @@ def init_msg(itemCode,seqNbr,result,scaledNetWeight=""):
 def error_msg(itemCode,seqNbr,mes=""):
 
 	if mes != "":
-    		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n"+ str(mes) + " \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n"+ str(mes) + " \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	elif mes == "":
 			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-#	time.sleep(2)
+
 	init_msg(itemCode,seqNbr,False)
 	sys.exit()
 
@@ -168,9 +167,6 @@ def callback(ch, method, properties, body):
 	msg=json.loads(body)
 	ms = "malformed message. No SignalBody"
 	if "SignalBody" not in msg:return
-
-	#		init_msg
-		#	sys.exit()
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
