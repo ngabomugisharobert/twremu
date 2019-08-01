@@ -42,7 +42,7 @@ def id_generator(size=15, chars=string.ascii_letters + string.digits):
 
 
 
-def init_msg(itemCode ="",seqNbr="",result=""):
+def init_msg(itemCode,seqNbr,result,scaledNetWeight=""):
 
 	file = open("sample_reply.json", "r")
 	rawmsg = file.read()
@@ -58,6 +58,9 @@ def init_msg(itemCode ="",seqNbr="",result=""):
 	msgdtl["SignalData"]["TransactionResult"] = result
 	msgdtl["SignalData"]["ItemCode"] = itemCode
 	msgdtl["SignalData"]["StationSequenceNumber"] = seqNbr
+	if seqNbr == 2:
+
+        	msgdtl["SignalData"]["ScaledNetWeight"] = scaledNetWeight
 	hdr={}
 	if "SenderApplicationCode" in hdrs:
 		hdr["SenderApplicationCode"]=hdrs["SenderApplicationCode"]
@@ -171,14 +174,15 @@ def callback(ch, method, properties, body):
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
+	if "ScaledNetWeight" in msg["SignalBody"]:scaledNetWeight=msg["SignalBody"]["ScaledNetWeight"]
 	kickOutFlag="False"
 	if "KickOutFlag" in msg["SignalBody"]:
 		kickOutFlag=msg["SignalBody"]["KickOutFlag"]
 
-
-
-	print('Received Message: '+signalCode+', ItemCode: '+itemCode+', Station: '+str(seqNbr))
-
+	if "ScaledNetWeight" not in msg["SignalBody"]:
+		print('Received Message: '+signalCode+', ItemCode: '+itemCode+', Station: '+str(seqNbr))
+	else:
+		print('Received Message: '+signalCode+', ItemCode: '+itemCode+', Station: '+str(seqNbr)+ ', ScalesNetWeight: ' + str(scaledNetWeight))
 #	call rules fnct to check if the incoming msg make sense SSN 1st msg from ID , 1 unit in 1 station, unit can't overtake another,
 #	write fake tester script that will send the message with error and add a reply message containing the transaction code = to fals
 
@@ -191,7 +195,10 @@ def callback(ch, method, properties, body):
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
 	if match != None:
 		situation.remove(match)
-	situation.append( { "ItemCode": itemCode, "StationSequenceNumber": seqNbr } )
+	if seqNbr == 2:
+		situation.append( { "ItemCode": itemCode, "StationSequenceNumber": seqNbr, "ScaledNetWeight" : scaledNetWeight } )
+	else:
+		situation.append( { "ItemCode": itemCode, "StationSequenceNumber": seqNbr} )
 
 	if kickOutFlag=="True":
 		print("kickout!!")
@@ -211,6 +218,8 @@ def callback(ch, method, properties, body):
 
 
 	time.sleep(2)
+	if seqNbr == 2:
+		init_msg(itemCode, seqNbr, True,scaledNetWeight)
 	init_msg(itemCode,seqNbr,True)
 print('Receiver starting')
 print(' [*] Waiting for messages. To exit press CTRL+C')
