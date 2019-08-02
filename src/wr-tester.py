@@ -31,82 +31,24 @@ def forward(x, nextSeqNbr):
 
 
 	# Read and parse the item.json
-	file2 = open("config.json", "r")
-	rawConf = file2.read()
-	file2.close()
+	file = open("config.json", "r")
+	rawConf = file.read()
+	file.close()
 
 	# Initiate situation
 	stationProperties = json.loads(rawConf)
 
-
-	signalCode=""
+	if nextSeqNbr>5:return
 	itemCode=x["ItemCode"]
 	scaledNetWeight = x["ScaledNetWeight"]
-	kickOutFlag=False
-	commandCode=""
-	commandDescription=""
-	workflowVersionCode=""
-	responseSignalCode=""
-
-	if nextSeqNbr==1:
-		stationProperties["Station"]["StationSequenceNumber"]=1
-		stationProperties["Station"]["StationName"]="identification"
-		stationProperties["Station"]["StationCode"]="RWR2_ID"
-		stationProperties["Station"]["IsScaling"]=False
-		stationProperties["Station"]["IsKickOut"]=False
-		signalCode="RWR2_ID"
-		commandCode="WRAPLINE_IDENTIFY_W"
-		commandDescription="Wrapline identification of unit"
-		workflowVersionCode="WRAPLINE_IDENTIFY"
-		responseSignalCode="RWR2_ID_RSP"
-	elif nextSeqNbr==2:
-		stationProperties["Station"]["StationSequenceNumber"]=2
-		stationProperties["Station"]["StationName"]="measurement"
-		stationProperties["Station"]["StationCode"]="RWR2_ME"
-		stationProperties["Station"]["IsScaling"]=True
-		stationProperties["Station"]["IsKickOut"]=False
-		signalCode="RWR2_ME"
-		commandCode="WRAPLINE_MEASURE_W"
-		commandDescription="Wrapline measure of unit"
-		workflowVersionCode="WRAPLINE_MEASURE"
-		responseSignalCode="RWR2_ME_RSP"
-	elif nextSeqNbr==3:
-		stationProperties["Station"]["StationSequenceNumber"]=3
-		stationProperties["Station"]["StationName"]="wrapping"
-		stationProperties["Station"]["StationCode"]="RWR2_WR"
-		stationProperties["Station"]["IsScaling"]=False
-		stationProperties["Station"]["IsKickOut"]=False
-		signalCode="RWR2_WR"
-		commandCode="WRAPLINE_WRAP_W"
-		commandDescription="Wrapline wrap of unit"
-		workflowVersionCode="WRAPLINE_WRAP"
-		responseSignalCode="RWR2_WR_RSP"
-	elif nextSeqNbr==4:
-		stationProperties["Station"]["StationSequenceNumber"]=4
-		stationProperties["Station"]["StationName"]="Exit"
-		stationProperties["Station"]["StationCode"]="RWR2_MO"
-		stationProperties["Station"]["IsScaling"]=False
-		stationProperties["Station"]["IsKickOut"]=False
-		signalCode="RWR2_MO"
-		commandCode="WRAPLINE_MOVE_W"
-		commandDescription="Wrapline label of unit"
-		workflowVersionCode="WRAPLINE_MOVE"
-		responseSignalCode="RWR2_MO_RSP"
-	elif nextSeqNbr==5:
-		stationProperties["Station"]["StationSequenceNumber"]=5
-		stationProperties["Station"]["StationName"]="Exit"
-		stationProperties["Station"]["StationCode"]="RWR2_MO"
-		stationProperties["Station"]["IsScaling"]=False
-		stationProperties["Station"]["IsKickOut"]=True
-		signalCode="RWR2_MO"
-		commandCode="WRAPLINE_MOVE_W"
-		commandDescription="Wrapline exit (move) of unit"
-		workflowVersionCode="WRAPLINE_MOVE"
-		responseSignalCode="RWR2_MO_RSP"
-		kickOutFlag=True
-	else:
-		print("nextSeqNbr invalid value")
-		return
+	kickOutFlag="False"
+	if nextSeqNbr == stationProperties["Stations"][4]["StationSequenceNumber"] and stationProperties["Stations"][4]["IsKickOut"] == "True":
+		kickOutFlag="True"
+	signalCode=stationProperties["Stations"][nextSeqNbr-1]["SignalCode"]
+	commandCode=stationProperties["Stations"][nextSeqNbr-1]["CommandCode"]
+	commandDescription=stationProperties["Stations"][nextSeqNbr-1]["CommandDescription"]
+	workflowVersionCode=stationProperties["Stations"][nextSeqNbr-1]["WorkflowVersionCode"]
+	responseSignalCode=stationProperties["Stations"][nextSeqNbr-1]["ResponseSignalCode"]
 
 	# read file
 	file = open("sample_message.json","r")
@@ -117,7 +59,7 @@ def forward(x, nextSeqNbr):
 	mqmsgid=msg["MsgId"]
 	msgtype=msg["Type"]
 	msgdtl=msg["Body"]
-
+	print(stationProperties["Stations"][2]["SignalCode"])
 	# replace needed fields
 	msgdtl["Command"]["CommandCode"]=commandCode
 	msgdtl["Command"]["CommandDescription"]=commandDescription
@@ -126,7 +68,7 @@ def forward(x, nextSeqNbr):
 	msgdtl["SignalBody"]["StationSequenceNumber"]=nextSeqNbr
 	msgdtl["SignalBody"]["ResponseSignalCode"]=responseSignalCode
 	if nextSeqNbr == 2:msgdtl["SignalBody"]["ScaledNetWeight"]=scaledNetWeight
-	if kickOutFlag==True:
+	if kickOutFlag=="True":
 		msgdtl["SignalBody"]["KickOutFlag"]="True"
 
 	msgdtl["SignalCode"]=signalCode
@@ -151,7 +93,7 @@ def forward(x, nextSeqNbr):
 	key = key.replace('Tips.Base.Messages.', '')
 	key = key.replace('Message', '')
 
-	msgdtl.update(stationProperties)
+	#msgdtl.update(stationProperties)
 
 	print('sending')
 	channel.basic_publish(exchange='(TIX Hub)',
@@ -163,7 +105,7 @@ def forward(x, nextSeqNbr):
 	# update the situation
 	match = next((x for x in situation if x["ItemCode"]==itemCode))
 	match["StationSequenceNumber"]=nextSeqNbr
-	if kickOutFlag==True:
+	if kickOutFlag=="True":
 		print("kickout!!")
 		situation.remove(match)
 	return None

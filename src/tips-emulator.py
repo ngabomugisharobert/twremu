@@ -41,7 +41,7 @@ def id_generator(size=15, chars=string.ascii_letters + string.digits):
 
 
 
-def init_msg(itemCode,seqNbr,result,scaledNetWeight="",Station=""):
+def init_msg(itemCode,seqNbr,result,scaledNetWeight=""):
 
 	file = open("sample_reply.json", "r")
 	rawmsg = file.read()
@@ -77,7 +77,7 @@ def init_msg(itemCode,seqNbr,result,scaledNetWeight="",Station=""):
 	key = msgtype.split(':')[0]
 	key = key.replace('Tips.Base.Messages.', '')
 	key = key.replace('Message', '')
-	msgdtl.update(Station)
+
 	publish = json.dumps(msgdtl)
 
 	channel.basic_publish(exchange='(TIX Hub)',
@@ -86,7 +86,7 @@ def init_msg(itemCode,seqNbr,result,scaledNetWeight="",Station=""):
 			properties=props,
 			mandatory=False)
 
-	print('Replied: '+msgdtl["SignalCode"]+', ItemCode: '+msgdtl["SignalData"]["ItemCode"]+', Station: '+str(Station["StationName"])+', TransactionResult: '+str(msgdtl["SignalData"]["TransactionResult"]))
+	print('Replied: '+msgdtl["SignalCode"]+', ItemCode: '+msgdtl["SignalData"]["ItemCode"]+', Station: '+str(msgdtl["SignalData"]["StationSequenceNumber"])+', TransactionResult: '+str(msgdtl["SignalData"]["TransactionResult"]))
 	print("--------------------------------------------------")
 
 
@@ -105,6 +105,17 @@ def error_msg(itemCode,seqNbr,mes=""):
 def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	global sys
 	global count
+
+	# Read and parse the item.json
+	file = open("config.json", "r")
+	rawConf = file.read()
+	file.close()
+
+	# Initiate situation
+	stationProperties = json.loads(rawConf)
+
+
+
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
 	match2 = next((y for y in situation if y["StationSequenceNumber"] == sequenceNumber), None)
 
@@ -118,28 +129,28 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 #2nd rule checking
 
 	ms = " this item has signalCode that does not match the station, something is wrong here."
-	if signalCode[5:] == 'ID' and sequenceNumber == 1:
+	if signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 1:
     		print(" ACCEPTED ",signalCode," to STATION ID")
-	elif signalCode[5:] == 'ME' and sequenceNumber == 2:
+	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 2:
     		print(" ACCEPTED ",signalCode," to STATION ME")
-	elif signalCode[5:] == 'WR' and sequenceNumber == 3:
+	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 3:
     		print(" ACCEPTED ",signalCode," to STATION WR")
-	elif signalCode[5:] == 'MO' and sequenceNumber == 4:
+	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 4:
     		print(" ACCEPTED ",signalCode," to STATION MO")
-	elif signalCode[5:] == 'MO' and sequenceNumber == 5:
+	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 5:
     		print(" ACCEPTED ",signalCode," to STATION MO")
 	else:
     		error_msg(itemCode,sequenceNumber,ms)
 
 #4th rule
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
-	if signalCode[5:] == 'ID' and itemCode in situation:
+	if signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and itemCode in situation:
 			error_msg(itemCode,sequenceNumber,ms)
 
 #5th rule
 
 	ms ="this unit Item : ",itemCode," is not in a Queue"
-	if signalCode[5:] != 'ID' and not any(itemCode for d in situation):
+	if signalCode != stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and not any(itemCode for d in situation):
 			error_msg(itemCode,sequenceNumber,ms)
 
 #6th rule
@@ -170,15 +181,15 @@ def callback(ch, method, properties, body):
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
-	if  msg["Station"]["IsScaling"] == True:scaledNetWeight=msg["SignalBody"]["ScaledNetWeight"]
+	if  "ScaledNetWeight" in msg["SignalBody"]:scaledNetWeight=msg["SignalBody"]["ScaledNetWeight"]
 	kickOutFlag="False"
-	if  msg["Station"]["IsKickOut"] == True:
+	if  "KickOutFlag" in msg["SignalBody"]:
 		kickOutFlag=msg["SignalBody"]["KickOutFlag"]
 
-	if  msg["Station"]["IsScaling"] == False:
-		print('Received Message: , ItemCode: '+itemCode+', Station: '+str(msg["Station"]))
+	if "ScaledNetWeight" not in msg["SignalBody"]:
+		print('Received Message: '+signalCode+', ItemCode: '+itemCode+', Station: '+str(seqNbr))
 	else:
-		print('Received Message: , ItemCode: '+itemCode+', Station: '+str(msg["Station"])+ ', ScalesNetWeight: ' + str(scaledNetWeight))
+		print('Received Message: '+signalCode+', ItemCode: '+itemCode+', Station: '+str(seqNbr)+ ', ScalesNetWeight: ' + str(scaledNetWeight))
 #	call rules fnct to check if the incoming msg make sense SSN 1st msg from ID , 1 unit in 1 station, unit can't overtake another,
 #	write fake tester script that will send the message with error and add a reply message containing the transaction code = to fals
 
@@ -196,7 +207,7 @@ def callback(ch, method, properties, body):
 	else:
 		situation.append( { "ItemCode": itemCode, "StationSequenceNumber": seqNbr} )
 
-	if msg["Station"]["IsKickOut"]==True:
+	if kickOutFlag=="True":
 		print("kickout!!")
 		matchByStation = next((x for x in situation if x["StationSequenceNumber"]==seqNbr and x["ItemCode"]!=itemCode), None)
 		if matchByStation is not None:
@@ -214,10 +225,10 @@ def callback(ch, method, properties, body):
 
 
 	time.sleep(2)
-	if msg["Station"]["StationSequenceNumber"] == 2:
-		init_msg(itemCode, seqNbr, True,scaledNetWeight,msg["Station"])
+	if seqNbr == 2:
+		init_msg(itemCode, seqNbr, True,scaledNetWeight)
 	else:
-		init_msg(itemCode,seqNbr,True,"",msg["Station"])
+		init_msg(itemCode,seqNbr,True)
 print('Receiver starting')
 print(' [*] Waiting for messages. To exit press CTRL+C')
 
