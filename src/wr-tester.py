@@ -6,10 +6,12 @@ import time
 # define globals
 mq_connect='localhost'
 situation=[]
+Stations=[]
 
 def start():
 	global channel
 	global situation
+	global Stations
 
 	# Read and parse the item.json
 	file = open("item.json", "r")
@@ -22,33 +24,37 @@ def start():
 	for item in itemCodes:
 		situation.append( { "ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"] } )
 
-	# Send first message
-	nextStep()
 
-def forward(x, nextSeqNbr):
-	global channel
-	global situation
-
-
-	# Read and parse the item.json
+	# Read and parse the config.json
 	file = open("config.json", "r")
 	rawConf = file.read()
 	file.close()
 
 	# Initiate situation
 	stationProperties = json.loads(rawConf)
+	properties = stationProperties["Stations"]
+	for property in properties:
+		Stations.append(property)
+
+# Send first message
+	nextStep()
+
+def forward(x, nextSeqNbr):
+	global channel
+	global situation
+	global Stations
 
 	if nextSeqNbr>5:return
 	itemCode=x["ItemCode"]
 	scaledNetWeight = x["ScaledNetWeight"]
 	kickOutFlag="False"
-	if nextSeqNbr == stationProperties["Stations"][4]["StationSequenceNumber"] and stationProperties["Stations"][4]["IsKickOut"] == "True":
+	if nextSeqNbr == next((p["StationSequenceNumber"] for p in Stations if p["StationSequenceNumber"] == 5)) and next((p["IsKickOut"] for p in Stations if p["StationSequenceNumber"] == 5)) == "True":
 		kickOutFlag="True"
-	signalCode=stationProperties["Stations"][nextSeqNbr-1]["SignalCode"]
-	commandCode=stationProperties["Stations"][nextSeqNbr-1]["CommandCode"]
-	commandDescription=stationProperties["Stations"][nextSeqNbr-1]["CommandDescription"]
-	workflowVersionCode=stationProperties["Stations"][nextSeqNbr-1]["WorkflowVersionCode"]
-	responseSignalCode=stationProperties["Stations"][nextSeqNbr-1]["ResponseSignalCode"]
+	signalCode= next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == nextSeqNbr))
+	commandCode= next((p["CommandCode"] for p in Stations if p["StationSequenceNumber"] == nextSeqNbr))
+	commandDescription=next((p["CommandCode"] for p in Stations if p["StationSequenceNumber"] == nextSeqNbr))
+	workflowVersionCode=next((p["CommandCode"] for p in Stations if p["StationSequenceNumber"] == nextSeqNbr))
+	responseSignalCode=next((p["CommandCode"] for p in Stations if p["StationSequenceNumber"] == nextSeqNbr))
 
 	# read file
 	file = open("sample_message.json","r")
@@ -59,7 +65,7 @@ def forward(x, nextSeqNbr):
 	mqmsgid=msg["MsgId"]
 	msgtype=msg["Type"]
 	msgdtl=msg["Body"]
-	print(stationProperties["Stations"][2]["SignalCode"])
+
 	# replace needed fields
 	msgdtl["Command"]["CommandCode"]=commandCode
 	msgdtl["Command"]["CommandDescription"]=commandDescription

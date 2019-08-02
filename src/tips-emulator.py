@@ -9,6 +9,7 @@ import random
 mq_connect='localhost'
 
 situation=[]
+Stations=[]
 print('Tips-Wrapline-Emulator starting')
 print('Connecting to RabbitMQ')
 
@@ -39,6 +40,17 @@ print('Defining business rules function')
 def id_generator(size=15, chars=string.ascii_letters + string.digits):
         return ''.join(random.choice(chars) for _ in range(size))
 
+
+# Read and parse the config.json
+file = open("config.json", "r")
+rawConf = file.read()
+file.close()
+
+# Initiate situation
+stationProperties = json.loads(rawConf)
+properties = stationProperties["Stations"]
+for property in properties:
+	Stations.append(property)
 
 
 def init_msg(itemCode,seqNbr,result,scaledNetWeight=""):
@@ -104,17 +116,7 @@ def error_msg(itemCode,seqNbr,mes=""):
 
 def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	global sys
-	global count
-
-	# Read and parse the item.json
-	file = open("config.json", "r")
-	rawConf = file.read()
-	file.close()
-
-	# Initiate situation
-	stationProperties = json.loads(rawConf)
-
-
+	global Stations
 
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
 	match2 = next((y for y in situation if y["StationSequenceNumber"] == sequenceNumber), None)
@@ -129,28 +131,28 @@ def business_rules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 #2nd rule checking
 
 	ms = " this item has signalCode that does not match the station, something is wrong here."
-	if signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 1:
+	if signalCode == next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 1:
     		print(" ACCEPTED ",signalCode," to STATION ID")
-	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 2:
+	elif signalCode == next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 2:
     		print(" ACCEPTED ",signalCode," to STATION ME")
-	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 3:
+	elif signalCode == next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 3:
     		print(" ACCEPTED ",signalCode," to STATION WR")
-	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 4:
+	elif signalCode == next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 4:
     		print(" ACCEPTED ",signalCode," to STATION MO")
-	elif signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and sequenceNumber == 5:
+	elif signalCode == next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 5:
     		print(" ACCEPTED ",signalCode," to STATION MO")
 	else:
     		error_msg(itemCode,sequenceNumber,ms)
 
 #4th rule
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
-	if signalCode == stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and itemCode in situation:
+	if signalCode == next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == 1)) and itemCode in situation:
 			error_msg(itemCode,sequenceNumber,ms)
 
 #5th rule
 
 	ms ="this unit Item : ",itemCode," is not in a Queue"
-	if signalCode != stationProperties["Stations"][sequenceNumber-1]["SignalCode"] and not any(itemCode for d in situation):
+	if signalCode != next((p["SignalCode"] for p in Stations if p["StationSequenceNumber"] == 1)) and not any(itemCode for d in situation):
 			error_msg(itemCode,sequenceNumber,ms)
 
 #6th rule
