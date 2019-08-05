@@ -17,7 +17,7 @@
 			"CommandDescription": "Wrapline measure of unit",
 			"WorkflowVersionCode": "WRAPLINE_MEASURE",
 			"ResponseSignalCode": "RWR2_ME_RSP",
-			"IsScaling": "True"
+			"IsScaling": true
 		},
 		{
 			"StationSequenceNumber": 3,
@@ -42,7 +42,7 @@
 			"CommandDescription": "Wrapline exit (move) of unit",
 			"WorkflowVersionCode": "WRAPLINE_MOVE",
 			"ResponseSignalCode": "RWR2_MO_RSP",
-			"IsKickOut":"True"
+			"IsKickOut": true
 		}
 
 
