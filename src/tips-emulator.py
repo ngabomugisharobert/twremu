@@ -116,16 +116,9 @@ def businessRules(signalCode,signalCodeResponse, itemCode, sequenceNumber,situat
 
 	#2nd rule checking
 	ms = " this item has signalCode that does not match the station, something is wrong here."
-	if signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) :
-    		print(" ACCEPTED ",signalCode," to STATION ID")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
-    		print(" ACCEPTED ",signalCode," to STATION ME")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
-    		print(" ACCEPTED ",signalCode," to STATION WR")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
-    		print(" ACCEPTED ",signalCode," to STATION MO")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
-    		print(" ACCEPTED ",signalCode," to STATION MO")
+	signal= next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber))
+	if signalCode == signal:
+    		print(" ACCEPTED ",signalCode," to STATION ", next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) )
 	else:
     		error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
