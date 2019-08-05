@@ -1,9 +1,51 @@
 {
-	"ItemCodes":
+	"ProcessCode": "TE-RWR2",
+	"Stations":
 	[
-		{"ItemCode":"0TE1900000013171","ScaledNetWeight":160},
-		{"ItemCode":"0TE1900000013172","ScaledNetWeight":190},
-		{"ItemCode":"0TE1900000013173","ScaledNetWeight":140},
-		{"ItemCode":"0TE1900000013174","ScaledNetWeight":170}
+		{
+			"StationSequenceNumber": 1,
+			"SignalCode": "RWR2_ID",
+			"CommandCode": "WRAPLINE_IDENTIFY_W",
+			"CommandDescription": "Wrapline identification of unit",
+			"WorkflowVersionCode": "WRAPLINE_IDENTIFY",
+			"ResponseSignalCode": "RWR2_ID_RSP"
+		},
+		{
+			"StationSequenceNumber": 2,
+			"SignalCode": "RWR2_ME",
+			"CommandCode": "WRAPLINE_MEASURE_W",
+			"CommandDescription": "Wrapline measure of unit",
+			"WorkflowVersionCode": "WRAPLINE_MEASURE",
+			"ResponseSignalCode": "RWR2_ME_RSP",
+			"IsScaling": true
+		},
+		{
+			"StationSequenceNumber": 3,
+			"SignalCode": "RWR2_WR",
+			"CommandCode": "WRAPLINE_WRAP_W",
+			"CommandDescription": "Wrapline wrap of unit",
+			"WorkflowVersionCode": "WRAPLINE_WRAP",
+			"ResponseSignalCode": "RWR2_WR_RSP"
+		},
+		{
+			"StationSequenceNumber": 4,
+			"SignalCode": "RWR2_MO",
+			"CommandCode": "WRAPLINE_WRAP_W",
+			"CommandDescription": "Wrapline label of unit",
+			"WorkflowVersionCode": "WRAPLINE_MOVE",
+			"ResponseSignalCode": "RWR2_MO_RSP"
+		},
+		{
+			"StationSequenceNumber": 5,
+			"SignalCode": "RWR2_MO",
+			"CommandCode": "WRAPLINE_WRAP_W",
+			"CommandDescription": "Wrapline exit (move) of unit",
+			"WorkflowVersionCode": "WRAPLINE_MOVE",
+			"ResponseSignalCode": "RWR2_MO_RSP",
+			"IsKickOut": true
+		}
+
+
+
 	]
 }

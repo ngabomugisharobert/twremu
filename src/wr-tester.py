@@ -4,80 +4,62 @@ import json
 import time
 
 # define globals
-mq_connect='localhost'
+connectionString='localhost'
 situation=[]
+stations=[]
 
+# The start function initiates the program.
 def start():
 	global channel
 	global situation
+	global stations
 
-	# Read and parse the config.json
-	file = open("config.json", "r")
-	rawConfig = file.read()
+	# Read and parse the item.json
+	file = open("item.json", "r")
+	rawItem = file.read()
 	file.close()
 
 	# Initiate situation
-	config = json.loads(rawConfig)
-	itemCodes=config["ItemCodes"]
+	item = json.loads(rawItem)
+	itemCodes = item["ItemCodes"]
 	for item in itemCodes:
 		situation.append( { "ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"] } )
+
+	# Read and parse the config.json
+	file = open("config.json", "r")
+	rawConf = file.read()
+	file.close()
+
+	# Initiate stations
+	stationProperties = json.loads(rawConf)
+	properties = stationProperties["Stations"]
+	for property in properties:
+		stations.append(property)
 
 	# Send first message
 	nextStep()
 
+# The forward function moves given unit (x) to a new station (nextSeqNbr).
 def forward(x, nextSeqNbr):
 	global channel
 	global situation
+	global stations
 
-	signalCode=""
 	itemCode=x["ItemCode"]
 	scaledNetWeight = x["ScaledNetWeight"]
-	kickOutFlag=False
-	commandCode=""
-	commandDescription=""
-	workflowVersionCode=""
-	responseSignalCode=""
 
-	if nextSeqNbr==1:
-		signalCode="RWR2_ID"
-		commandCode="WRAPLINE_IDENTIFY_W"
-		commandDescription="Wrapline identification of unit"
-		workflowVersionCode="WRAPLINE_IDENTIFY"
-		responseSignalCode="RWR2_ID_RSP"
-	elif nextSeqNbr==2:
-		signalCode="RWR2_ME"
-		commandCode="WRAPLINE_MEASURE_W"
-		commandDescription="Wrapline measure of unit"
-		workflowVersionCode="WRAPLINE_MEASURE"
-		responseSignalCode="RWR2_ME_RSP"
-	elif nextSeqNbr==3:
-		signalCode="RWR2_WR"
-		commandCode="WRAPLINE_WRAP_W"
-		commandDescription="Wrapline wrap of unit"
-		workflowVersionCode="WRAPLINE_WRAP"
-		responseSignalCode="RWR2_WR_RSP"
-	elif nextSeqNbr==4:
-		signalCode="RWR2_MO"
-		commandCode="WRAPLINE_MOVE_W"
-		commandDescription="Wrapline label of unit"
-		workflowVersionCode="WRAPLINE_MOVE"
-		responseSignalCode="RWR2_MO_RSP"
-	elif nextSeqNbr==5:
-		signalCode="RWR2_MO"
-		commandCode="WRAPLINE_MOVE_W"
-		commandDescription="Wrapline exit (move) of unit"
-		workflowVersionCode="WRAPLINE_MOVE"
-		responseSignalCode="RWR2_MO_RSP"
-		kickOutFlag=True
-	else:
-		print("nextSeqNbr invalid value")
-		return
+	# get the desired station
+	station=next(p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
+	signalCode = station["SignalCode"]
+	commandCode = station["CommandCode"]
+	commandDescription=station["CommandDescription"]
+	workflowVersionCode=station["WorkflowVersionCode"]
+	responseSignalCode=station["ResponseSignalCode"]
 
-	# read file
+	# read sample message file
 	file = open("sample_message.json","r")
 	rawmsg=file.read()
 	file.close()
-
 	msg=json.loads(rawmsg)
 	hdrs=msg["Header"]
 	mqmsgid=msg["MsgId"]
@@ -91,12 +73,16 @@ def forward(x, nextSeqNbr):
 	msgdtl["SignalBody"]["ItemCode"]=itemCode
 	msgdtl["SignalBody"]["StationSequenceNumber"]=nextSeqNbr
 	msgdtl["SignalBody"]["ResponseSignalCode"]=responseSignalCode
-	if nextSeqNbr == 2:msgdtl["SignalBody"]["ScaledNetWeight"]=scaledNetWeight
-	if kickOutFlag==True:
+	
+	if "IsScaling" in station and station["IsScaling"] == True:
+		msgdtl["SignalBody"]["ScaledNetWeight"]= scaledNetWeight
+	
+	if "IsKickOut" in station and station["IsKickOut"] == True:
 		msgdtl["SignalBody"]["KickOutFlag"]="True"
 
 	msgdtl["SignalCode"]=signalCode
 
+	# process and send the message
 	hdr={}
 	if "SenderApplicationCode" in hdrs:
 		hdr["SenderApplicationCode"]=hdrs["SenderApplicationCode"]
@@ -119,21 +105,22 @@ def forward(x, nextSeqNbr):
 
 	print('sending')
 	channel.basic_publish(exchange='(TIX Hub)',
-                      routing_key=key,
-                      body=json.dumps(msgdtl),
+		routing_key=key,
+		body=json.dumps(msgdtl),
 		properties=props,
 		mandatory=False)
 
 	# update the situation
 	match = next((x for x in situation if x["ItemCode"]==itemCode))
 	match["StationSequenceNumber"]=nextSeqNbr
-	if kickOutFlag==True:
+	if "IsKickOut" in station and station["IsKickOut"] == True:
 		print("kickout!!")
 		situation.remove(match)
-	return None
 
+# The nextStep function gets called to make next move in the program.
 def nextStep():
 	global situation
+	global stations
 
 	# find highest possible entry candidate to the wrapping line
 	candidates=[]
@@ -149,19 +136,34 @@ def nextStep():
 		print("i: "+"itemCode: "+str(i["ItemCode"])+", StationSequenceNumber: "+str(i["StationSequenceNumber"]))
 		seqNbr=i["StationSequenceNumber"]
 		print("seqNbr: "+str(seqNbr))
+		nextSeqNbr=0
 
 		if seqNbr is None:
-			seqNbr=0
-		nextSeqNbr=seqNbr+1
+			nextSeqNbr=stations[0]["StationSequenceNumber"]
+		else:
+			station=next((x for x in stations if x["StationSequenceNumber"]==seqNbr))
+			index=stations.index(station)
+			if index + 1 >= len(stations):
+				continue
+
+			nextSeqNbr=stations[index+1]["StationSequenceNumber"]
+		
 		print("nextSeqNbr: "+str(nextSeqNbr))
 
+		nextStation=next((x for x in stations if x["StationSequenceNumber"]==nextSeqNbr))
+		
+		isKickOut = False
+		if "IsKickOut" in nextStation and nextStation["IsKickOut"] == True:
+			isKickOut = True
+
 		match = next((x for x in candidates if x["StationSequenceNumber"]==nextSeqNbr), None)
-		if match is None:
+		if match is None or isKickOut == True:
 			forward(i, nextSeqNbr)
 			return True
+
 	return False
 
-
+# The callback function gets called when MQ message is received
 def callback(ch, method, properties, body):
 	global channel
 	global situation
@@ -173,12 +175,9 @@ def callback(ch, method, properties, body):
 	print("*******************************************************************************************************")
 	print(reply)
 	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
 	print("\n")
-	signalCode=reply["SignalCode"]
-	itemCode=reply["SignalData"]["ItemCode"]
-	seqNbr=reply["SignalData"]["StationSequenceNumber"]
-# exit checking
+
+	# Call nextStep to evaluate next move. If none, exit.
 	if not nextStep():
 		print("Work is done. Bye!")
 		sys.exit()
@@ -187,10 +186,12 @@ def callback(ch, method, properties, body):
 print('Tips-Wrapline-Tester starting')
 print('Connecting to RabbitMQ')
 
+# Make a connection to MQ host
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host=mq_connect))
+    pika.ConnectionParameters(host=connectionString))
 channel = connection.channel()
 
+# Setup the MQ host
 print('Declaring exchange "(TIX Hub)"')
 channel.exchange_declare(exchange='(TIX Hub)', exchange_type='direct', durable=True)
 
@@ -209,9 +210,11 @@ result = channel.queue_declare(queue='wr-tester')
 print('Creating binding "Base.ToIpc.ToIpc" -> "wr-tester"')
 channel.queue_bind(exchange='Base.ToIpc.ToIpc', queue='wr-tester')
 
+# Call start to send the first message
 print("Sending the very first message")
 start()
 
+# Start consume loop
 channel.basic_consume(
     queue='wr-tester', on_message_callback=callback, auto_ack=True)
 channel.start_consuming()
