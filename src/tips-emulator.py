@@ -29,7 +29,7 @@ def start():
 		stations.append(property)
 
 # The reply function sends a reply message back to the tester.
-def reply(itemCode,seqNbr,result,scaledNetWeight):
+def reply(signalCodeResponse,itemCode,seqNbr,result,scaledNetWeight):
 	global channel
 
 	# Read and parse the reply message
@@ -43,7 +43,7 @@ def reply(itemCode,seqNbr,result,scaledNetWeight):
 	msgdtl=reply["Body"]
 
 	# replace needed fields
-	msgdtl["SignalCode"]
+	msgdtl["SignalCode"]=signalCodeResponse
 	msgdtl["SignalData"]["TransactionResult"] = result
 	msgdtl["SignalData"]["ItemCode"] = itemCode
 	msgdtl["SignalData"]["StationSequenceNumber"] = seqNbr
@@ -84,17 +84,17 @@ def reply(itemCode,seqNbr,result,scaledNetWeight):
 
 
 # The error function prints error message and replies to the sender
-def error(itemCode,seqNbr,mes=""):
+def error(signalCodeResponse,itemCode,seqNbr,mes=""):
 	if mes != "":
     		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! \n"+ str(mes) + " \n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	elif mes == "":
 			print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
-	reply(itemCode,seqNbr,False, None)
+	reply(signalCodeResponse,itemCode,seqNbr,False, None)
 	sys.exit()
 
 # The businessRules function checks the incoming message fit to the overall situation
-def businessRules(signalCode, itemCode, sequenceNumber,situation,msg_received):
+def businessRules(signalCode,signalCodeResponse, itemCode, sequenceNumber,situation,msg_received):
 	###  B U S I N E S S - R U L E S -  P E R F O R M E D
 	################################################################
 	######### check that signal code matches sequence number
@@ -112,32 +112,32 @@ def businessRules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	ms = "the Station is already occupied"
 	for a in situation:
     		if a["StationSequenceNumber"]== sequenceNumber and a["StationSequenceNumber"]!= 5:
-    				error(itemCode,sequenceNumber,ms)
+    				error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#2nd rule checking
 	ms = " this item has signalCode that does not match the station, something is wrong here."
-	if signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 1:
+	if signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) :
     		print(" ACCEPTED ",signalCode," to STATION ID")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 2:
+	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
     		print(" ACCEPTED ",signalCode," to STATION ME")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 3:
+	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
     		print(" ACCEPTED ",signalCode," to STATION WR")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 4:
+	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
     		print(" ACCEPTED ",signalCode," to STATION MO")
-	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == 5:
+	elif signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)) and sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)):
     		print(" ACCEPTED ",signalCode," to STATION MO")
 	else:
-    		error(itemCode,sequenceNumber,ms)
+    		error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#4th rule
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
-	if signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == 1)) and itemCode in situation:
-			error(itemCode,sequenceNumber,ms)
+	if "IsIdentification" in stations and stations["IsIdentification"] == True and signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)))) and itemCode in situation:
+			error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#5th rule
 	ms ="this unit Item : ",itemCode," is not in a Queue"
-	if signalCode != next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == 1)) and not any(itemCode for d in situation):
-			error(itemCode,sequenceNumber,ms)
+	if "IsIdentification" in stations and stations["IsIdentification"] == True and signalCode != next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)))) and not any(itemCode for d in situation):
+			error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#6th rule
 	ms= "this item :", itemCode , " has reached to exit station"
@@ -151,6 +151,7 @@ def callback(ch, method, properties, body):
 
 	# process incoming message
 	msg=json.loads(body)
+	signalCodeResponse=msg["SignalBody"]["ResponseSignalCode"]
 	signalCode=msg["SignalCode"]
 	itemCode=msg["SignalBody"]["ItemCode"]
 	seqNbr=msg["SignalBody"]["StationSequenceNumber"]
@@ -171,7 +172,7 @@ def callback(ch, method, properties, body):
 	#	call rules fnct to check if the incoming msg make sense SSN 1st msg from ID , 1 unit in 1 station, unit can't overtake another,
 	#	write fake tester script that will send the message with error and add a reply message containing the transaction code = to fals
 	print("--------------------------------------------------------------- \n")
-	businessRules(signalCode,itemCode,seqNbr,situation,msg)
+	businessRules(signalCode,signalCodeResponse,itemCode,seqNbr,situation,msg)
 	print("--------------------------------------------------------------- \n")
 
 	match = next((x for x in situation if x["ItemCode"]==itemCode), None)
@@ -201,7 +202,7 @@ def callback(ch, method, properties, body):
 
 	time.sleep(2)
 
-	reply(itemCode, seqNbr, True,scaledNetWeight)
+	reply(signalCodeResponse,itemCode, seqNbr, True,scaledNetWeight)
 
 # Start of initialization
 print('Tips-Wrapline-Emulator starting')

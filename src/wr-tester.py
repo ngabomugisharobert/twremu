@@ -2,11 +2,17 @@ import pika
 import sys
 import json
 import time
+import string
+import random
 
 # define globals
 connectionString='localhost'
 situation=[]
 stations=[]
+
+# The Id generator creates a new message id
+def id_generator(size=15, chars=string.ascii_letters + string.digits):
+        return ''.join(random.choice(chars) for _ in range(size))
 
 # The start function initiates the program.
 def start():
@@ -96,7 +102,7 @@ def forward(x, nextSeqNbr):
 	props = pika.spec.BasicProperties(headers=hdr,
 		delivery_mode=2,
 		correlation_id=mqmsgid,
-		message_id=mqmsgid,
+		message_id= id_generator(),
 		type=msgtype)
 
 	key = msgtype.split(':')[0]
