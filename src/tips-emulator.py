@@ -124,12 +124,13 @@ def businessRules(signalCode,signalCodeResponse, itemCode, sequenceNumber,situat
 
 	#4th rule
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
-	if "IsIdentification" in stations and stations["IsIdentification"] == True and signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)))) and itemCode in situation:
+	sequence = next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber))
+	if "IsIdentification" in stations and stations["IsIdentification"] == True and itemCode in situation:
 			error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#5th rule
 	ms ="this unit Item : ",itemCode," is not in a Queue"
-	if "IsIdentification" in stations and stations["IsIdentification"] == True and signalCode != next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == sequenceNumber == next((p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)))) and not any(itemCode for d in situation):
+	if "IsIdentification" in stations and stations["IsIdentification"] != True and not any(itemCode for d in situation):
 			error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#6th rule
