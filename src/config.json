@@ -8,7 +8,8 @@
 			"CommandCode": "WRAPLINE_IDENTIFY_W",
 			"CommandDescription": "Wrapline identification of unit",
 			"WorkflowVersionCode": "WRAPLINE_IDENTIFY",
-			"ResponseSignalCode": "RWR2_ID_RSP"
+			"ResponseSignalCode": "RWR2_ID_RSP",
+			"IsIdentification": true
 		},
 		{
 			"StationSequenceNumber": 2,
