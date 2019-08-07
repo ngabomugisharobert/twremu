@@ -130,6 +130,7 @@ def businessRules(signalCode, itemCode, sequenceNumber,situation,msg_received):
     		error(itemCode,sequenceNumber,ms)
 
 	#4th rule
+<<<<<<< Updated upstream
 	ms ="the ID station already has this unit Item : ",itemCode," in a Queue"
 	if signalCode == next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == 1)) and itemCode in situation:
 			error(itemCode,sequenceNumber,ms)
@@ -138,6 +139,18 @@ def businessRules(signalCode, itemCode, sequenceNumber,situation,msg_received):
 	ms ="this unit Item : ",itemCode," is not in a Queue"
 	if signalCode != next((p["SignalCode"] for p in stations if p["StationSequenceNumber"] == 1)) and not any(itemCode for d in situation):
 			error(itemCode,sequenceNumber,ms)
+=======
+	station = next((i for i in stations if i["StationSequenceNumber"] == sequenceNumber),None)
+	item = next((i for i in situation if i["ItemCode"] == itemCode),None)
+	ms = "the ID station already has this unit Item : ",itemCode," in a Queue"
+	if "IsIdentification" in station.keys() and station["IsIdentification"] == True and item is not None and itemCode == item.get("ItemCode"):
+			error(signalCodeResponse,itemCode,sequenceNumber,ms)
+
+	#5th rule
+	ms ="this unit Item : ",itemCode," is not in a Queue"
+	if  "IsIdentification" not in station.keys() and item is not None and itemCode != item.get("ItemCode"):
+			error(signalCodeResponse,itemCode,sequenceNumber,ms)
+>>>>>>> Stashed changes
 
 	#6th rule
 	ms= "this item :", itemCode , " has reached to exit station"
