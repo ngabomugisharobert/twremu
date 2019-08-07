@@ -123,17 +123,16 @@ def businessRules(signalCode,signalCodeResponse, itemCode, sequenceNumber,situat
     		error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#4th rule
-
-	station = next((i for i in stations if i["StationSequenceNumber"] == sequenceNumber),None)
-	item = next((i for i in situation if i["ItemCode"] == itemCode),None)
+	station = next((i for i in stations if i["StationSequenceNumber"] == sequenceNumber),"")
+	item = next((i for i in situation if i["ItemCode"] == itemCode),"")
 	ms = "the ID station already has this unit Item : ",itemCode," in a Queue"
-	if "IsIdentification" in station.keys() and station["IsIdentification"] == True and item is not None and itemCode == item.get("ItemCode"):
-
+	print(situation)
+	if "IsIdentification" in station and itemCode in item:
 			error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#5th rule
 	ms ="this unit Item : ",itemCode," is not in a Queue"
-	if  "IsIdentification" not in station.keys() and item is not None and itemCode != item.get("ItemCode"):
+	if  "IsIdentification" not in station and itemCode != item["ItemCode"]:
 			error(signalCodeResponse,itemCode,sequenceNumber,ms)
 
 	#6th rule
