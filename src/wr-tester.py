@@ -183,6 +183,12 @@ def callback(ch, method, properties, body):
 	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	print("\n")
 
+	if(reply["SignalData"]["TransactionResult"] != "True"):
+		print("ERROR!!!")
+		sys.exit()
+
+	time.sleep(5)
+
 	# Call nextStep to evaluate next move. If none, exit.
 	if not nextStep():
 		print("Work is done. Bye!")
