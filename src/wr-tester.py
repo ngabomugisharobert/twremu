@@ -9,6 +9,8 @@ import random
 connectionString='localhost'
 situation=[]
 stations=[]
+FailedUnits=[]
+moveProperties=None
 
 # The Id generator creates a new message id
 def id_generator(size=15, chars=string.ascii_letters + string.digits):
@@ -19,6 +21,7 @@ def start():
 	global channel
 	global situation
 	global stations
+	global moveProperties
 
 	# Read and parse the item.json
 	file = open("item.json", "r")
@@ -38,7 +41,9 @@ def start():
 
 	# Initiate stations
 	stationProperties = json.loads(rawConf)
+	moveProperties = stationProperties
 	properties = stationProperties["Stations"]
+	#moveProperties.append(str(stationProperties["DriveThrough"]))
 	for property in properties:
 		stations.append(property)
 
@@ -50,17 +55,33 @@ def forward(x, nextSeqNbr):
 	global channel
 	global situation
 	global stations
+	global FailedUnits
+	global moveProperties
 
 	itemCode=x["ItemCode"]
 	scaledNetWeight = x["ScaledNetWeight"]
-
+	print("555555555555555555555555555555551111111111111111111111111111111111111111111")
+	
+	print(moveProperties["DriveThrough"]["SignalCode"])
+	print(type(moveProperties))
+	print("555555555555555555555555555555551111111111111111111111111111111111111111111")
+	print(FailedUnits)
+    
 	# get the desired station
 	station=next(p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
-	signalCode = station["SignalCode"]
-	commandCode = station["CommandCode"]
-	commandDescription=station["CommandDescription"]
-	workflowVersionCode=station["WorkflowVersionCode"]
-	responseSignalCode=station["ResponseSignalCode"]
+    
+	if itemCode in FailedUnits:
+	    signalCode = moveProperties["DriveThrough"]["SignalCode"]
+	    commandCode = moveProperties["DriveThrough"]["CommandCode"]
+	    commandDescription= moveProperties["DriveThrough"]["CommandDescription"]
+	    workflowVersionCode= moveProperties["DriveThrough"]["WorkflowVersionCode"]
+	    responseSignalCode= moveProperties["DriveThrough"]["ResponseSignalCode"]
+	else:
+	    signalCode = station["SignalCode"]
+	    commandCode = station["CommandCode"]
+	    commandDescription=station["CommandDescription"]
+	    workflowVersionCode=station["WorkflowVersionCode"]
+	    responseSignalCode=station["ResponseSignalCode"]
 
 	# read sample message file
 	file = open("sample_message.json","r")
@@ -127,6 +148,7 @@ def forward(x, nextSeqNbr):
 def nextStep():
 	global situation
 	global stations
+	global FailedUnits
 
 	# find highest possible entry candidate to the wrapping line
 	candidates=[]
@@ -173,6 +195,7 @@ def nextStep():
 def callback(ch, method, properties, body):
 	global channel
 	global situation
+	global FailedUnits
 
 	print("callback")
 	reply=json.loads(body)
@@ -183,9 +206,9 @@ def callback(ch, method, properties, body):
 	print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
 	print("\n")
 
-	if(reply["SignalData"]["TransactionResult"] != "True"):
-		print("ERROR!!!")
-		sys.exit()
+	if(str(reply["SignalData"]["TransactionResult"] )== "False"):
+		FailedUnits.append(reply["SignalData"]["ItemCode"])
+		#sys.exit()
 
 	# Call nextStep to evaluate next move. If none, exit.
 	if not nextStep():
