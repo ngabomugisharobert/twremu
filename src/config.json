@@ -1,7 +1,6 @@
 {
 	"ProcessCode": "TE-RWR2",
-	"Stations":
-	[
+	"Stations": [
 		{
 			"StationSequenceNumber": 1,
 			"SignalCode": "RWR2_ID",
@@ -45,8 +44,5 @@
 			"ResponseSignalCode": "RWR2_MO_RSP",
 			"IsKickOut": true
 		}
-
-
-
 	]
 }
