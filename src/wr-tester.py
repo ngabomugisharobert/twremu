@@ -60,28 +60,21 @@ def forward(x, nextSeqNbr):
 
 	itemCode=x["ItemCode"]
 	scaledNetWeight = x["ScaledNetWeight"]
-	print("555555555555555555555555555555551111111111111111111111111111111111111111111")
-	
-	print(moveProperties["DriveThrough"]["SignalCode"])
-	print(type(moveProperties))
-	print("555555555555555555555555555555551111111111111111111111111111111111111111111")
-	print(FailedUnits)
     
 	# get the desired station
 	station=next(p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
     
+	propBase = None
 	if itemCode in FailedUnits:
-	    signalCode = moveProperties["DriveThrough"]["SignalCode"]
-	    commandCode = moveProperties["DriveThrough"]["CommandCode"]
-	    commandDescription= moveProperties["DriveThrough"]["CommandDescription"]
-	    workflowVersionCode= moveProperties["DriveThrough"]["WorkflowVersionCode"]
-	    responseSignalCode= moveProperties["DriveThrough"]["ResponseSignalCode"]
+	    propBase = moveProperties["DriveThrough"]
 	else:
-	    signalCode = station["SignalCode"]
-	    commandCode = station["CommandCode"]
-	    commandDescription=station["CommandDescription"]
-	    workflowVersionCode=station["WorkflowVersionCode"]
-	    responseSignalCode=station["ResponseSignalCode"]
+	    propBase = station
+
+	signalCode = propBase["SignalCode"]
+	commandCode = propBase["CommandCode"]
+	commandDescription=propBase["CommandDescription"]
+	workflowVersionCode=propBase["WorkflowVersionCode"]
+	responseSignalCode=propBase["ResponseSignalCode"]
 
 	# read sample message file
 	file = open("sample_message.json","r")
