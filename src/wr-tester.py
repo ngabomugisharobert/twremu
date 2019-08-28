@@ -9,7 +9,7 @@ import random
 connectionString='localhost'
 situation=[]
 stations=[]
-FailedUnits=[]
+failedUnits=[]
 moveProperties=None
 
 # The Id generator creates a new message id
@@ -55,7 +55,7 @@ def forward(x, nextSeqNbr):
 	global channel
 	global situation
 	global stations
-	global FailedUnits
+	global failedUnits
 	global moveProperties
 
 	itemCode=x["ItemCode"]
@@ -65,7 +65,7 @@ def forward(x, nextSeqNbr):
 	station=next(p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
     
 	propBase = None
-	if itemCode in FailedUnits:
+	if itemCode in failedUnits:
 	    propBase = moveProperties["DriveThrough"]
 	else:
 	    propBase = station
@@ -141,7 +141,7 @@ def forward(x, nextSeqNbr):
 def nextStep():
 	global situation
 	global stations
-	global FailedUnits
+	global failedUnits
 
 	# find highest possible entry candidate to the wrapping line
 	candidates=[]
@@ -188,7 +188,7 @@ def nextStep():
 def callback(ch, method, properties, body):
 	global channel
 	global situation
-	global FailedUnits
+	global failedUnits
 
 	print("callback")
 	reply=json.loads(body)
@@ -200,7 +200,7 @@ def callback(ch, method, properties, body):
 	print("\n")
 
 	if(str(reply["SignalData"]["TransactionResult"] )== "False"):
-		FailedUnits.append(reply["SignalData"]["ItemCode"])
+		failedUnits.append(reply["SignalData"]["ItemCode"])
 		#sys.exit()
 
 	# Call nextStep to evaluate next move. If none, exit.
