@@ -10,6 +10,7 @@ import random
 connectionString = 'localhost'
 situation = []
 stations = []
+drive = None
 
 # The Id generator creates a new message id
 
@@ -21,6 +22,8 @@ def id_generator(size=15, chars=string.ascii_letters + string.digits):
 
 
 def start():
+
+    global drive
     # Read and parse the config.json
     file = open("config.json", "r")
     rawConf = file.read()
@@ -28,6 +31,7 @@ def start():
 
     # Initiate situation
     stationProperties = json.loads(rawConf)
+    drive = stationProperties
     properties = stationProperties["Stations"]
     for property in properties:
         stations.append(property)
@@ -117,6 +121,7 @@ def businessRules(signalCode, signalCodeResponse, itemCode, sequenceNumber, situ
 
     global sys
     global stations
+    global drive
 
     # 1st rule checking
     ms = "the Station is already occupied"
@@ -128,7 +133,7 @@ def businessRules(signalCode, signalCodeResponse, itemCode, sequenceNumber, situ
     ms = " this item has signalCode that does not match the station, something is wrong here."
     signal = next((p["SignalCode"]
                    for p in stations if p["StationSequenceNumber"] == sequenceNumber))
-    if signalCode == signal:
+    if signalCode == signal or signalCode == drive["DriveThrough"]["SignalCode"]:
         print(" ACCEPTED ", signalCode, " to STATION ", next(
             (p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)))
     else:
@@ -157,6 +162,7 @@ def businessRules(signalCode, signalCodeResponse, itemCode, sequenceNumber, situ
 def callback(ch, method, properties, body):
     global channel
     global situation
+    rslt = True
 
     # process incoming message
     msg = json.loads(body)
@@ -165,7 +171,7 @@ def callback(ch, method, properties, body):
     itemCode = msg["SignalBody"]["ItemCode"]
     seqNbr = msg["SignalBody"]["StationSequenceNumber"]
 
-    scaledNetWeight = None
+    scaledNetWeight = 0
     if "ScaledNetWeight" in msg["SignalBody"]:
         scaledNetWeight = msg["SignalBody"]["ScaledNetWeight"]
 
@@ -214,10 +220,14 @@ def callback(ch, method, properties, body):
 
     print(output)
     print()
+    if int(scaledNetWeight) >= 200:
+        rslt = False
 
     time.sleep(2)
-
-    reply(signalCodeResponse, itemCode, seqNbr, True, scaledNetWeight)
+    print("yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+    print(rslt)
+    print("okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
+    reply(signalCodeResponse, itemCode, seqNbr, rslt, scaledNetWeight)
 
 
 # Start of initialization

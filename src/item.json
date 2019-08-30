@@ -1,20 +1,12 @@
 {
 	"ItemCodes": [
 		{
-			"ItemCode": "0TE1900000013171",
+			"ItemCode": "350000000000000224",
 			"ScaledNetWeight": 160
 		},
 		{
-			"ItemCode": "0TE1900000013172",
-			"ScaledNetWeight": 190
-		},
-		{
-			"ItemCode": "0TE1900000013173",
-			"ScaledNetWeight": 140
-		},
-		{
-			"ItemCode": "0TE1900000013174",
-			"ScaledNetWeight": 170
+			"ItemCode": "350000000000000225",
+			"ScaledNetWeight": 250
 		}
 	]
 }

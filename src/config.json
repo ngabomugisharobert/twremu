@@ -1,5 +1,12 @@
 {
 	"ProcessCode": "TE-RWR2",
+	"DriveThrough": {
+		"SignalCode": "RWR2_MO",
+		"CommandCode": "WRAPLINE_MOVE_W",
+		"CommandDescription": "Wrapline Move unit",
+		"WorkflowVersionCode": "WRAPLINE_MOVE",
+		"ResponseSignalCode": "RWR2_MO_RSP"
+	},
 	"Stations": [
 		{
 			"StationSequenceNumber": 1,

@@ -9,6 +9,8 @@ import random
 connectionString = 'localhost'
 situation = []
 stations = []
+failedUnits = []
+moveProperties = None
 
 # The Id generator creates a new message id
 
@@ -23,6 +25,7 @@ def start():
     global channel
     global situation
     global stations
+    global moveProperties
 
     # Read and parse the item.json
     file = open("item.json", "r")
@@ -43,7 +46,9 @@ def start():
 
     # Initiate stations
     stationProperties = json.loads(rawConf)
+    moveProperties = stationProperties
     properties = stationProperties["Stations"]
+    # moveProperties.append(str(stationProperties["DriveThrough"]))
     for property in properties:
         stations.append(property)
 
@@ -57,6 +62,8 @@ def forward(x, nextSeqNbr):
     global channel
     global situation
     global stations
+    global failedUnits
+    global moveProperties
 
     itemCode = x["ItemCode"]
     scaledNetWeight = x["ScaledNetWeight"]
@@ -64,11 +71,18 @@ def forward(x, nextSeqNbr):
     # get the desired station
     station = next(
         p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
-    signalCode = station["SignalCode"]
-    commandCode = station["CommandCode"]
-    commandDescription = station["CommandDescription"]
-    workflowVersionCode = station["WorkflowVersionCode"]
-    responseSignalCode = station["ResponseSignalCode"]
+
+    propBase = None
+    if itemCode in failedUnits:
+        propBase = moveProperties["DriveThrough"]
+    else:
+        propBase = station
+
+    signalCode = propBase["SignalCode"]
+    commandCode = propBase["CommandCode"]
+    commandDescription = propBase["CommandDescription"]
+    workflowVersionCode = propBase["WorkflowVersionCode"]
+    responseSignalCode = propBase["ResponseSignalCode"]
 
     # read sample message file
     file = open("sample_message.json", "r")
@@ -137,6 +151,7 @@ def forward(x, nextSeqNbr):
 def nextStep():
     global situation
     global stations
+    global failedUnits
 
     # find highest possible entry candidate to the wrapping line
     candidates = []
@@ -189,6 +204,7 @@ def nextStep():
 def callback(ch, method, properties, body):
     global channel
     global situation
+    global failedUnits
 
     print("callback")
     reply = json.loads(body)
@@ -199,9 +215,9 @@ def callback(ch, method, properties, body):
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("\n")
 
-    if(reply["SignalData"]["TransactionResult"] != "True"):
-        print("ERROR!!!")
-        sys.exit()
+    if(str(reply["SignalData"]["TransactionResult"]) == "False"):
+        failedUnits.append(reply["SignalData"]["ItemCode"])
+        # sys.exit()
 
     # Call nextStep to evaluate next move. If none, exit.
     if not nextStep():
