@@ -11,6 +11,7 @@ situation = []
 stations = []
 failedUnits = []
 moveProperties = None
+itemCode = ""
 
 # The Id generator creates a new message id
 
@@ -64,6 +65,7 @@ def forward(x, nextSeqNbr):
     global stations
     global failedUnits
     global moveProperties
+    global itemCode
 
     itemCode = x["ItemCode"]
     scaledNetWeight = x["ScaledNetWeight"]
@@ -205,6 +207,7 @@ def callback(ch, method, properties, body):
     global channel
     global situation
     global failedUnits
+    global itemCode
 
     print("callback")
     reply = json.loads(body)
@@ -214,7 +217,11 @@ def callback(ch, method, properties, body):
     print(reply)
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("\n")
-
+    if(reply["SignalData"]["ItemCode"]  != itemCode):
+        for item in situation:
+            if (item["ItemCode"]== itemCode):
+                item["ItemCode"]=reply["SignalData"]["ItemCode"]
+       
     if(str(reply["SignalData"]["TransactionResult"]) == "False"):
         failedUnits.append(reply["SignalData"]["ItemCode"])
         # sys.exit()
