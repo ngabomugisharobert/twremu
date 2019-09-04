@@ -4,6 +4,7 @@ import json
 import time
 import string
 import random
+import time
 
 # define globals
 connectionString = 'localhost'
@@ -103,6 +104,9 @@ def forward(x, nextSeqNbr):
     msgdtl["SignalBody"]["ItemCode"] = itemCode
     msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
+
+    ts = time.time()
+    msgdtl["UtcTimeStamp"] = ts
 
     if "IsScaling" in station and station["IsScaling"] == True:
         msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
@@ -217,11 +221,11 @@ def callback(ch, method, properties, body):
     print(reply)
     print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print("\n")
-    if(reply["SignalData"]["ItemCode"]  != itemCode):
+    if(reply["SignalData"]["ItemCode"] != itemCode):
         for item in situation:
-            if (item["ItemCode"]== itemCode):
-                item["ItemCode"]=reply["SignalData"]["ItemCode"]
-       
+            if (item["ItemCode"] == itemCode):
+                item["ItemCode"] = reply["SignalData"]["ItemCode"]
+
     if(str(reply["SignalData"]["TransactionResult"]) == "False"):
         failedUnits.append(reply["SignalData"]["ItemCode"])
         # sys.exit()
