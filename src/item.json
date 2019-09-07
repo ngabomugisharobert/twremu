@@ -2,11 +2,15 @@
 	"ItemCodes": [
 		{
 			"ItemCode": "3500000000000",
-			"ScaledNetWeight": 160
+			"ScaledNetWeight": 160,
+			"Width": 700,
+			"Diameter":8000
 		},
 		{
 			"ItemCode": "350000000000000225",
-			"ScaledNetWeight": 250
+			"ScaledNetWeight": 250,
+			"Width": 500,
+			"Diameter":5000
 		}
 	]
 }
