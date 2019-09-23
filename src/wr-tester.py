@@ -39,7 +39,7 @@ def start():
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"]})
+            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"],"Diameter": item["Diameter"]})
 
     # Read and parse the config.json
     file = open("config.json", "r")
@@ -70,6 +70,9 @@ def forward(x, nextSeqNbr):
 
     itemCode = x["ItemCode"]
     scaledNetWeight = x["ScaledNetWeight"]
+    width = x["Width"]
+    diameter = x["Diameter"]
+
 
     # get the desired station
     station = next(
@@ -110,6 +113,8 @@ def forward(x, nextSeqNbr):
 
     if "IsScaling" in station and station["IsScaling"] == True:
         msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
+        msgdtl["SignalBody"]["Width"] = width
+        msgdtl["SignalBody"]["Diameter"] = diameter
 
     if "IsKickOut" in station and station["IsKickOut"] == True:
         msgdtl["SignalBody"]["KickOutFlag"] = "True"
@@ -173,7 +178,11 @@ def nextStep():
         print("i: "+"itemCode: "+str(i["ItemCode"]) +
               ", StationSequenceNumber: "+str(i["StationSequenceNumber"]))
         seqNbr = i["StationSequenceNumber"]
+        width = i["Width"]
+        diameter = i["Diameter"]
         print("seqNbr: "+str(seqNbr))
+        print("width: "+str(width))
+        print("diameter: "+str(diameter))
         nextSeqNbr = 0
 
         if seqNbr is None:
