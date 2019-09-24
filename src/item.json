@@ -1,16 +1,14 @@
 {
 	"ItemCodes": [
 		{
-			"ItemCode": "3500000000000",
-			"ScaledNetWeight": 160,
-			"Width": 700,
-			"Diameter":8000
+			"ItemCode": "3500000000000224",
+			"ScaledNetWeight": 8000,
+			"Width": 800,
+			"Diameter":5000
 		},
 		{
-			"ItemCode": "350000000000000225",
-			"ScaledNetWeight": 250,
-			"Width": 500,
-			"Diameter":5000
+			"ItemCode": "3500000000000225",
+			"ScaledNetWeight": 4000
 		}
 	]
 }

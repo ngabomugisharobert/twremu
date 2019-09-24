@@ -34,13 +34,24 @@ def start():
     rawItem = file.read()
     file.close()
 
-    # Initiate situation
+    # Initiate situation  
     item = json.loads(rawItem)
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
-        situation.append(
-            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"],"Diameter": item["Diameter"]})
-
+        #checking for Diameter and Width
+        if "Width" in item and "Diameter" in item:
+            situation.append(
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"], "Diameter": item["Diameter"]})
+        elif "Width" in item:
+            situation.append(
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"]})
+        elif "Diameter" in item:
+            situation.append(
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Diameter": item["Diameter"]})
+        else:
+            situation.append(
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"]})
+        
     # Read and parse the config.json
     file = open("config.json", "r")
     rawConf = file.read()
@@ -70,8 +81,11 @@ def forward(x, nextSeqNbr):
 
     itemCode = x["ItemCode"]
     scaledNetWeight = x["ScaledNetWeight"]
-    width = x["Width"]
-    diameter = x["Diameter"]
+    if "Width" in x:
+        width = x["Width"]
+
+    if "Diameter" in x:   
+        diameter = x["Diameter"]
 
 
     # get the desired station
@@ -113,8 +127,10 @@ def forward(x, nextSeqNbr):
 
     if "IsScaling" in station and station["IsScaling"] == True:
         msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
-        msgdtl["SignalBody"]["Width"] = width
-        msgdtl["SignalBody"]["Diameter"] = diameter
+        if "Width" in x:
+            msgdtl["SignalBody"]["Width"] = width
+        if "Diameter" in x:
+            msgdtl["SignalBody"]["Diameter"] = diameter
 
     if "IsKickOut" in station and station["IsKickOut"] == True:
         msgdtl["SignalBody"]["KickOutFlag"] = "True"
@@ -178,11 +194,16 @@ def nextStep():
         print("i: "+"itemCode: "+str(i["ItemCode"]) +
               ", StationSequenceNumber: "+str(i["StationSequenceNumber"]))
         seqNbr = i["StationSequenceNumber"]
-        width = i["Width"]
-        diameter = i["Diameter"]
+
         print("seqNbr: "+str(seqNbr))
-        print("width: "+str(width))
-        print("diameter: "+str(diameter))
+        if "Width" in i:
+            width = i["Width"]
+            print("width: "+str(width))
+        if "Diameter" in i:
+            diameter = i["Diameter"]
+            print("diameter: "+str(diameter))
+        
+        
         nextSeqNbr = 0
 
         if seqNbr is None:
