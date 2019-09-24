@@ -38,20 +38,18 @@ def start():
     item = json.loads(rawItem)
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
-        #checking for Diameter and Width
-        if "Width" in item and "Diameter" in item:
-            situation.append(
-                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"], "Diameter": item["Diameter"]})
-        elif "Width" in item:
-            situation.append(
-                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"]})
-        elif "Diameter" in item:
-            situation.append(
-                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Diameter": item["Diameter"]})
-        else:
-            situation.append(
-                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"]})
+        situation.append(
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
         
+        #checking for Weight, Diameter and Width
+        if "ScaledNetWeight" in item:
+            situation[-1]["ScaledNetWeight"] = item["ScaledNetWeight"]
+        if "Width" in item:
+            situation[-1]["Width"] = item["Width"]
+        if "Diameter" in item:
+            situation[-1]["Diameter"] = item["Diameter"]    
+    
+            
     # Read and parse the config.json
     file = open("config.json", "r")
     rawConf = file.read()
@@ -80,7 +78,8 @@ def forward(x, nextSeqNbr):
     global itemCode
 
     itemCode = x["ItemCode"]
-    scaledNetWeight = x["ScaledNetWeight"]
+    if "ScaledNetWeight" in x:
+        scaledNetWeight = x["ScaledNetWeight"]
     if "Width" in x:
         width = x["Width"]
 
@@ -126,7 +125,8 @@ def forward(x, nextSeqNbr):
     msgdtl["UtcTimeStamp"] = ts
 
     if "IsScaling" in station and station["IsScaling"] == True:
-        msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
+        if "ScaledNetWeight" in x:
+            msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
         if "Width" in x:
             msgdtl["SignalBody"]["Width"] = width
         if "Diameter" in x:
@@ -202,6 +202,7 @@ def nextStep():
         if "Diameter" in i:
             diameter = i["Diameter"]
             print("diameter: "+str(diameter))
+        print (i)
         
         
         nextSeqNbr = 0
