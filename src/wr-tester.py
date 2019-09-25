@@ -34,13 +34,22 @@ def start():
     rawItem = file.read()
     file.close()
 
-    # Initiate situation
+    # Initiate situation  
     item = json.loads(rawItem)
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None, "ScaledNetWeight": item["ScaledNetWeight"],"Width": item["Width"],"Diameter": item["Diameter"]})
-
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
+        
+        #checking for Weight, Diameter and Width
+        if "ScaledNetWeight" in item:
+            situation[-1]["ScaledNetWeight"] = item["ScaledNetWeight"]
+        if "Width" in item:
+            situation[-1]["Width"] = item["Width"]
+        if "Diameter" in item:
+            situation[-1]["Diameter"] = item["Diameter"]    
+    
+            
     # Read and parse the config.json
     file = open("config.json", "r")
     rawConf = file.read()
@@ -69,9 +78,13 @@ def forward(x, nextSeqNbr):
     global itemCode
 
     itemCode = x["ItemCode"]
-    scaledNetWeight = x["ScaledNetWeight"]
-    width = x["Width"]
-    diameter = x["Diameter"]
+    if "ScaledNetWeight" in x:
+        scaledNetWeight = x["ScaledNetWeight"]
+    if "Width" in x:
+        width = x["Width"]
+
+    if "Diameter" in x:   
+        diameter = x["Diameter"]
 
 
     # get the desired station
@@ -112,9 +125,12 @@ def forward(x, nextSeqNbr):
     msgdtl["UtcTimeStamp"] = ts
 
     if "IsScaling" in station and station["IsScaling"] == True:
-        msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
-        msgdtl["SignalBody"]["Width"] = width
-        msgdtl["SignalBody"]["Diameter"] = diameter
+        if "ScaledNetWeight" in x:
+            msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
+        if "Width" in x:
+            msgdtl["SignalBody"]["Width"] = width
+        if "Diameter" in x:
+            msgdtl["SignalBody"]["Diameter"] = diameter
 
     if "IsKickOut" in station and station["IsKickOut"] == True:
         msgdtl["SignalBody"]["KickOutFlag"] = "True"
@@ -178,11 +194,17 @@ def nextStep():
         print("i: "+"itemCode: "+str(i["ItemCode"]) +
               ", StationSequenceNumber: "+str(i["StationSequenceNumber"]))
         seqNbr = i["StationSequenceNumber"]
-        width = i["Width"]
-        diameter = i["Diameter"]
+
         print("seqNbr: "+str(seqNbr))
-        print("width: "+str(width))
-        print("diameter: "+str(diameter))
+        if "Width" in i:
+            width = i["Width"]
+            print("width: "+str(width))
+        if "Diameter" in i:
+            diameter = i["Diameter"]
+            print("diameter: "+str(diameter))
+        print (i)
+        
+        
         nextSeqNbr = 0
 
         if seqNbr is None:
