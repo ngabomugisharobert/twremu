@@ -1,4 +1,11 @@
 {
+	"Rabbitmq": {
+		"User": "guest",
+		"Password": "guest",
+		"Host": "localhost", 
+		"Port": 5672, 
+		"VirtualHost": "/"
+	},
 	"ProcessCode": "TE-RWR2",
 	"DriveThrough": {
 		"SignalCode": "RWR2_MO",
