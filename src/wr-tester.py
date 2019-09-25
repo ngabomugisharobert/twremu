@@ -20,8 +20,24 @@ itemCode = ""
 def id_generator(size=15, chars=string.ascii_letters + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-# The start function initiates the program.
+# The loader function reads both item and config json files
 
+def itemLoader():
+    #loading item.json
+    file = open("item.json", "r")
+    RawItem = file.read()
+    file.close()
+    return RawItem
+
+def configLoader():
+    #loading config.json
+    file = open("config.json", "r")
+    RawConf = file.read()
+    file.close()
+    return RawConf
+    
+
+# The start function initiates the program.
 
 def start():
     global channel
@@ -30,9 +46,7 @@ def start():
     global moveProperties
 
     # Read and parse the item.json
-    file = open("item.json", "r")
-    rawItem = file.read()
-    file.close()
+    rawItem = itemLoader()
 
     # Initiate situation  
     item = json.loads(rawItem)
@@ -51,9 +65,7 @@ def start():
     
             
     # Read and parse the config.json
-    file = open("config.json", "r")
-    rawConf = file.read()
-    file.close()
+    
 
     # Initiate stations
     stationProperties = json.loads(rawConf)
@@ -158,7 +170,7 @@ def forward(x, nextSeqNbr):
     key = key.replace('Tips.Base.Messages.', '')
     key = key.replace('Message', '')
 
-    print('sending')
+    print('Sending...')
     channel.basic_publish(exchange='(TIX Hub)',
                           routing_key=key,
                           body=json.dumps(msgdtl),
@@ -191,10 +203,11 @@ def nextStep():
 
     # find first candidate that can be moved forward
     for i in candidates:
-        print("i: "+"itemCode: "+str(i["ItemCode"]) +
-              ", StationSequenceNumber: "+str(i["StationSequenceNumber"]))
+        print("Item: "+"itemCode: "+str(i["ItemCode"]))
         seqNbr = i["StationSequenceNumber"]
 
+        print("Details")
+        print("-----------------------------------------------------------------")
         print("seqNbr: "+str(seqNbr))
         if "Width" in i:
             width = i["Width"]
@@ -202,8 +215,6 @@ def nextStep():
         if "Diameter" in i:
             diameter = i["Diameter"]
             print("diameter: "+str(diameter))
-        print (i)
-        
         
         nextSeqNbr = 0
 
@@ -219,6 +230,8 @@ def nextStep():
             nextSeqNbr = stations[index+1]["StationSequenceNumber"]
 
         print("nextSeqNbr: "+str(nextSeqNbr))
+        print("------------------------------------------------------------------")
+        print("\n")
 
         nextStation = next(
             (x for x in stations if x["StationSequenceNumber"] == nextSeqNbr))
@@ -232,6 +245,7 @@ def nextStep():
         if match is None or isKickOut == True:
             forward(i, nextSeqNbr)
             return True
+        
 
     return False
 
@@ -244,13 +258,12 @@ def callback(ch, method, properties, body):
     global failedUnits
     global itemCode
 
-    print("callback")
+    print("Callback..")
     reply = json.loads(body)
-    print("\n")
-    print("the reply from emulator")
+    print("Reply from emulator")
     print("*******************************************************************************************************")
     print(reply)
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("*******************************************************************************************************")
     print("\n")
     if(reply["SignalData"]["ItemCode"] != itemCode):
         for item in situation:
@@ -268,15 +281,36 @@ def callback(ch, method, properties, body):
 
 
 # Start of initialization
-print('Tips-Wrapline-Tester starting')
-print('Connecting to RabbitMQ')
+print('******************************************TIPS-WRAPLINE-TESTER STARTING********************************')
+print('Connecting to RabbitMQ...')
 
 # Make a connection to MQ host
-connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host=connectionString))
+
+rawConf = configLoader()
+
+# Initiate connection
+connectionProperties = json.loads(rawConf)
+rabbitmq = connectionProperties["Rabbitmq"]
+
+user = rabbitmq["User"]
+password = rabbitmq["Password"]
+host = rabbitmq["Host"] 
+port = rabbitmq["Port"] 
+virtualHost = rabbitmq["VirtualHost"]
+
+credentials = pika.PlainCredentials(user, password)
+parameters = pika.ConnectionParameters(host,
+                                       port,
+                                       virtualHost,
+                                       credentials)
+connection = pika.BlockingConnection(parameters)
 channel = connection.channel()
+# connection = pika.BlockingConnection(
+#     pika.ConnectionParameters(host=connectionString))
+
 
 # Setup the MQ host
+print("...")
 print('Declaring exchange "(TIX Hub)"')
 channel.exchange_declare(exchange='(TIX Hub)',
                          exchange_type='direct', durable=True)
@@ -296,11 +330,12 @@ result = channel.queue_declare(queue='wr-tester')
 
 print('Creating binding "Base.ToIpc.ToIpc" -> "wr-tester"')
 channel.queue_bind(exchange='Base.ToIpc.ToIpc', queue='wr-tester')
-
+print("*******************************************************************************************************")
 # Call start to send the first message
-print("Sending the very first message")
+print("                                         Sending the first message                                     ")
+print("*******************************************************************************************************")
 start()
-
+print("*******************************************************************************************************")
 # Start consume loop
 channel.basic_consume(
     queue='wr-tester', on_message_callback=callback, auto_ack=True)
