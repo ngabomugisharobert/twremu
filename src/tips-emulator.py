@@ -219,14 +219,11 @@ def callback(ch, method, properties, body):
     output = json.dumps(situation, indent=4, sort_keys=True)
 
     print(output)
-    print()
     if int(scaledNetWeight) >= 200:
         rslt = False
 
     time.sleep(2)
-    print("yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
     print(rslt)
-    print("okkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
     reply(signalCodeResponse, itemCode, seqNbr, rslt, scaledNetWeight)
 
 
