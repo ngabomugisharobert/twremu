@@ -265,6 +265,12 @@ def callback(ch, method, properties, body):
     print(reply)
     print("*******************************************************************************************************")
     print("\n")
+
+    rawData = json.loads(configLoader())
+    sleepTime = rawData["SleepDelay"]
+
+    print("Waiting...")
+    time.sleep(sleepTime)
     if(reply["SignalData"]["ItemCode"] != itemCode):
         for item in situation:
             if (item["ItemCode"] == itemCode):
