@@ -123,11 +123,12 @@ def forward(x, nextSeqNbr):
 
     ts = time.time()
     msgdtl["UtcTimeStamp"] = ts
+
     if "IsScaling" in station and station["IsScaling"] == True:
         if "ScaledNetWeight" in x:
             msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
         if "Width" in x:
-            msgdtl["SignalBody"]["MeasuredWidth"] = width
+            msgdtl["SignalBody"]["Width"] = width
         if "Diameter" in x:
             msgdtl["SignalBody"]["Diameter"] = diameter
 
@@ -135,7 +136,7 @@ def forward(x, nextSeqNbr):
         msgdtl["SignalBody"]["KickOutFlag"] = "True"
 
     msgdtl["SignalCode"] = signalCode
-    
+
     # process and send the message
     hdr = {}
     if "SenderApplicationCode" in hdrs:
