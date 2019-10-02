@@ -98,7 +98,6 @@ def forward(x, nextSeqNbr):
     if "Diameter" in x:   
         diameter = x["Diameter"]
 
-
     # get the desired station
     station = next(
         p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
@@ -169,7 +168,9 @@ def forward(x, nextSeqNbr):
     key = key.replace('Tips.Base.Messages.', '')
     key = key.replace('Message', '')
 
-    print('Sending...')
+    
+    printSend(msgdtl)
+
     channel.basic_publish(exchange='(TIX Hub)',
                           routing_key=key,
                           body=json.dumps(msgdtl),
@@ -180,16 +181,18 @@ def forward(x, nextSeqNbr):
     match = next((x for x in situation if x["ItemCode"] == itemCode))
     match["StationSequenceNumber"] = nextSeqNbr
     if "IsKickOut" in station and station["IsKickOut"] == True:
-        print("kickout!!")
         situation.remove(match)
 
+    print("Message sent, waiting for a response")
+
 # The nextStep function gets called to make next move in the program.
-
-
 def nextStep():
     global situation
     global stations
     global failedUnits
+
+    # Print current situaton
+    printSituation(situation)
 
     # find highest possible entry candidate to the wrapping line
     candidates = []
@@ -202,18 +205,12 @@ def nextStep():
 
     # find first candidate that can be moved forward
     for i in candidates:
-        print("Item: "+"itemCode: "+str(i["ItemCode"]))
         seqNbr = i["StationSequenceNumber"]
 
-        print("Details")
-        print("-----------------------------------------------------------------")
-        print("seqNbr: "+str(seqNbr))
         if "Width" in i:
             width = i["Width"]
-            print("width: "+str(width))
         if "Diameter" in i:
             diameter = i["Diameter"]
-            print("diameter: "+str(diameter))
         
         nextSeqNbr = 0
 
@@ -227,10 +224,6 @@ def nextStep():
                 continue
 
             nextSeqNbr = stations[index+1]["StationSequenceNumber"]
-
-        print("nextSeqNbr: "+str(nextSeqNbr))
-        print("------------------------------------------------------------------")
-        print("\n")
 
         nextStation = next(
             (x for x in stations if x["StationSequenceNumber"] == nextSeqNbr))
@@ -248,28 +241,50 @@ def nextStep():
 
     return False
 
+# Print details of current situation.
+def printSituation(situation):
+    print("------------------------- ")
+    print("Current situation: ")
+    print("Station\tUnit")
+    for i in situation:
+        print(str(i["StationSequenceNumber"]) + "\t" + i["ItemCode"])
+    print("------------------------- ")
+    print()
+
+# Print details of sent message.
+def printSend(msgdtl):
+    print("  Sending Message:         ===> ")
+    print("   |  SignalCode: " + msgdtl["SignalCode"])
+    print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
+    print("   |  StationSequenceNumber: " + str(msgdtl["SignalBody"]["StationSequenceNumber"]))
+    print()
+
+# Print details of received message.
+def printReply(reply):
+    print("   <===   Message received: ")
+    print("          |  SignalCode: " + reply["SignalCode"])
+    print("          |  ItemCode: " + reply["SignalData"]["ItemCode"])
+    print("          |  StationSequenceNumber: " + str(reply["SignalData"]["StationSequenceNumber"]))
+    print("          |  TransactionResult: " + str(reply["SignalData"]["TransactionResult"]))
+    print()
+
 # The callback function gets called when MQ message is received
-
-
 def callback(ch, method, properties, body):
     global channel
     global situation
     global failedUnits
     global itemCode
 
-    print("Callback..")
     reply = json.loads(body)
-    print("Reply from emulator")
-    print("*******************************************************************************************************")
-    print(reply)
-    print("*******************************************************************************************************")
-    print("\n")
+    printReply(reply)
 
     rawData = json.loads(configLoader())
     sleepTime = rawData["SleepDelay"]
 
-    print("Waiting...")
+    print("Sleeping " + str(sleepTime) + " seconds...")
+
     time.sleep(sleepTime)
+
     if(reply["SignalData"]["ItemCode"] != itemCode):
         for item in situation:
             if (item["ItemCode"] == itemCode):
@@ -286,8 +301,8 @@ def callback(ch, method, properties, body):
 
 
 # Start of initialization
-print('******************************************TIPS-WRAPLINE-TESTER STARTING********************************')
-print('Connecting to RabbitMQ...')
+print('TIPS-Wrapline-Tester (wr-tester.py)')
+print('Version 2019.09.30')
 
 # Make a connection to MQ host
 
@@ -313,9 +328,13 @@ channel = connection.channel()
 # connection = pika.BlockingConnection(
 #     pika.ConnectionParameters(host=connectionString))
 
+print('Host: ' + host)
+print('Port: ' + str(port))
+print('VirtualHost: ' + virtualHost)
+print('User: ' + user)
+print('Connecting to RabbitMQ...')
 
 # Setup the MQ host
-print("...")
 print('Declaring exchange "(TIX Hub)"')
 channel.exchange_declare(exchange='(TIX Hub)',
                          exchange_type='direct', durable=True)
@@ -335,13 +354,15 @@ result = channel.queue_declare(queue='wr-tester')
 
 print('Creating binding "Base.ToIpc.ToIpc" -> "wr-tester"')
 channel.queue_bind(exchange='Base.ToIpc.ToIpc', queue='wr-tester')
-print("*******************************************************************************************************")
+
+print('RabbitMQ setup complete')
+print()
+
 # Call start to send the first message
-print("                                         Sending the first message                                     ")
-print("*******************************************************************************************************")
 start()
-print("*******************************************************************************************************")
+
 # Start consume loop
 channel.basic_consume(
     queue='wr-tester', on_message_callback=callback, auto_ack=True)
+
 channel.start_consuming()
