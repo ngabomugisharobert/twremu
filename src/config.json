@@ -1,63 +1,63 @@
 {
-	"Rabbitmq": {
-		"User": "guest",
-		"Password": "guest",
-		"Host": "localhost", 
-		"Port": 5672, 
-		"VirtualHost": "/"
-	},
-	"ProcessCode": "TE-RWR2",
-	"SleepDelay":7,
-	"DriveThrough": {
-		"SignalCode": "RWR2_MO",
-		"CommandCode": "WRAPLINE_MOVE_W",
-		"CommandDescription": "Wrapline Move unit",
-		"WorkflowVersionCode": "WRAPLINE_MOVE",
-		"ResponseSignalCode": "RWR2_MO_RSP"
-	},
-	"Stations": [
-		{
-			"StationSequenceNumber": 1,
-			"SignalCode": "RWR2_ID",
-			"CommandCode": "WRAPLINE_IDENTIFY_W",
-			"CommandDescription": "Wrapline identification of unit",
-			"WorkflowVersionCode": "WRAPLINE_IDENTIFY",
-			"ResponseSignalCode": "RWR2_ID_RSP",
-			"IsIdentification": true
-		},
-		{
-			"StationSequenceNumber": 2,
-			"SignalCode": "RWR2_ME",
-			"CommandCode": "WRAPLINE_MEASURE_W",
-			"CommandDescription": "Wrapline measure of unit",
-			"WorkflowVersionCode": "WRAPLINE_MEASURE",
-			"ResponseSignalCode": "RWR2_ME_RSP",
-			"IsScaling": true
-		},
-		{
-			"StationSequenceNumber": 3,
-			"SignalCode": "RWR2_WR",
-			"CommandCode": "WRAPLINE_WRAP_W",
-			"CommandDescription": "Wrapline wrap of unit",
-			"WorkflowVersionCode": "WRAPLINE_WRAP",
-			"ResponseSignalCode": "RWR2_WR_RSP"
-		},
-		{
-			"StationSequenceNumber": 4,
-			"SignalCode": "RWR2_MO",
-			"CommandCode": "WRAPLINE_WRAP_W",
-			"CommandDescription": "Wrapline label of unit",
-			"WorkflowVersionCode": "WRAPLINE_MOVE",
-			"ResponseSignalCode": "RWR2_MO_RSP"
-		},
-		{
-			"StationSequenceNumber": 5,
-			"SignalCode": "RWR2_MO",
-			"CommandCode": "WRAPLINE_WRAP_W",
-			"CommandDescription": "Wrapline exit (move) of unit",
-			"WorkflowVersionCode": "WRAPLINE_MOVE",
-			"ResponseSignalCode": "RWR2_MO_RSP",
-			"IsKickOut": true
-		}
-	]
+    "Rabbitmq": {
+        "User": "guest",
+        "Password": "guest",
+        "Host": "localhost",
+        "Port": 5672,
+        "VirtualHost": "/"
+    },
+    "ProcessCode": "TE-RWR2",
+    "WorkstationCode": "WS-RWR2",
+    "SleepDelay": 7,
+    "DriveThrough": {
+        "SignalCode": "RWR2_MO",
+        "CommandCode": "WRAPLINE_MOVE_W",
+        "CommandDescription": "Wrapline Move unit",
+        "WorkflowVersionCode": "WRAPLINE_MOVE",
+        "ResponseSignalCode": "RWR2_MO_RSP"
+    },
+    "Stations": [{
+            "StationSequenceNumber": 1,
+            "SignalCode": "RWR2_ID",
+            "CommandCode": "WRAPLINE_IDENTIFY_W",
+            "CommandDescription": "Wrapline identification of unit",
+            "WorkflowVersionCode": "WRAPLINE_IDENTIFY",
+            "ResponseSignalCode": "RWR2_ID_RSP",
+            "IsIdentification": true
+        },
+        {
+            "StationSequenceNumber": 2,
+            "SignalCode": "RWR2_ME",
+            "CommandCode": "WRAPLINE_MEASURE_W",
+            "CommandDescription": "Wrapline measure of unit",
+            "WorkflowVersionCode": "WRAPLINE_MEASURE",
+            "ResponseSignalCode": "RWR2_ME_RSP",
+            "IsScaling": true
+        },
+        {
+            "StationSequenceNumber": 3,
+            "SignalCode": "RWR2_WR",
+            "CommandCode": "WRAPLINE_WRAP_W",
+            "CommandDescription": "Wrapline wrap of unit",
+            "WorkflowVersionCode": "WRAPLINE_WRAP",
+            "ResponseSignalCode": "RWR2_WR_RSP"
+        },
+        {
+            "StationSequenceNumber": 4,
+            "SignalCode": "RWR2_MO",
+            "CommandCode": "WRAPLINE_WRAP_W",
+            "CommandDescription": "Wrapline label of unit",
+            "WorkflowVersionCode": "WRAPLINE_MOVE",
+            "ResponseSignalCode": "RWR2_MO_RSP"
+        },
+        {
+            "StationSequenceNumber": 5,
+            "SignalCode": "RWR2_MO",
+            "CommandCode": "WRAPLINE_WRAP_W",
+            "CommandDescription": "Wrapline exit (move) of unit",
+            "WorkflowVersionCode": "WRAPLINE_MOVE",
+            "ResponseSignalCode": "RWR2_MO_RSP",
+            "IsKickOut": true
+        }
+    ]
 }
