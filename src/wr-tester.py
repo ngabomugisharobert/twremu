@@ -114,6 +114,14 @@ def forward(x, nextSeqNbr):
     workflowVersionCode = propBase["WorkflowVersionCode"]
     responseSignalCode = propBase["ResponseSignalCode"]
 
+    rawConf = configLoader()
+
+    # get attributes
+    attributes = json.loads(rawConf)
+
+    proCode = attributes["ProcessCode"]
+    workStationCode = attributes["WorkstationCode"]
+
     # read sample message file
     file = open("sample_message.json", "r")
     rawmsg = file.read()
@@ -131,6 +139,10 @@ def forward(x, nextSeqNbr):
     msgdtl["SignalBody"]["ItemCode"] = itemCode
     msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
+    msgdtl["SignalBody"]["ProcessCode"] = proCode
+    msgdtl["ProcessCode"] = proCode
+    msgdtl["WorkstationCode"] = workStationCode
+    hdrs["WorkstationCode"] = workStationCode
 
     ts = time.time()
     msgdtl["UtcTimeStamp"] = ts
