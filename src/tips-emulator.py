@@ -257,6 +257,10 @@ result = channel.queue_declare(queue='tips-emulator')
 print('Creating binding "Base.FromIpc.IpcToPts" -> "tips-emulator"')
 channel.queue_bind(exchange='Base.FromIpc.IpcToPts', queue='tips-emulator')
 
+if( result.method.message_count != 0):
+    print("there are messages in queue ('tips-emulator') , messages " + str(result.method.message_count))
+    exit()
+
 # Call start to set up globals
 print("Starting program")
 start()

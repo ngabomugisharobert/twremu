@@ -367,6 +367,10 @@ result = channel.queue_declare(queue='wr-tester')
 print('Creating binding "Base.ToIpc.ToIpc" -> "wr-tester"')
 channel.queue_bind(exchange='Base.ToIpc.ToIpc', queue='wr-tester')
 
+if( result.method.message_count != 0):
+    print("there are messages in queue ('wr-tester') , messages " + str(result.method.message_count))
+    exit()
+
 print('RabbitMQ setup complete')
 print()
 
