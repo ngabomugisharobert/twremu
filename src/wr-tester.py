@@ -140,6 +140,7 @@ def forward(x, nextSeqNbr):
     msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
     msgdtl["SignalBody"]["ProcessCode"] = proCode
+    msgdtl["ProcessCode"] = proCode
     msgdtl["WorkstationCode"] = workStationCode
     hdrs["WorkstationCode"] = workStationCode
 
