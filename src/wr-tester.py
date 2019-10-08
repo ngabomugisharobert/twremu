@@ -53,7 +53,7 @@ def start():
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
+                {"ItemCode": item['ItemCode'],"InfoString": item["InfoString"], "StationSequenceNumber": None})
         
         #checking for Weight, Diameter and Width
         if "ScaledNetWeight" in item:
@@ -90,6 +90,7 @@ def forward(x, nextSeqNbr):
     global itemCode
 
     itemCode = x["ItemCode"]
+    infostr = x["InfoString"]
     if "ScaledNetWeight" in x:
         scaledNetWeight = x["ScaledNetWeight"]
     if "Width" in x:
@@ -140,6 +141,7 @@ def forward(x, nextSeqNbr):
     msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
     msgdtl["SignalBody"]["ProcessCode"] = proCode
+    msgdtl["SignalBody"]["InfoString"] = infostr
     msgdtl["ProcessCode"] = proCode
     msgdtl["WorkstationCode"] = workStationCode
     hdrs["WorkstationCode"] = workStationCode
