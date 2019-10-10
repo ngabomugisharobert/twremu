@@ -141,7 +141,6 @@ def forward(x, nextSeqNbr):
     msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
     msgdtl["SignalBody"]["ProcessCode"] = proCode
-    msgdtl["SignalBody"]["InfoString"] = infostr
     msgdtl["ProcessCode"] = proCode
     msgdtl["WorkstationCode"] = workStationCode
     hdrs["WorkstationCode"] = workStationCode
@@ -158,6 +157,9 @@ def forward(x, nextSeqNbr):
 
     if "IsKickOut" in station and station["IsKickOut"] == True:
         msgdtl["SignalBody"]["KickOutFlag"] = "True"
+        
+    if "IsIdentification" in station and station["IsIdentification"] == True:
+        msgdtl["SignalBody"]["InfoString"] = infostr
 
     msgdtl["SignalCode"] = signalCode
     
