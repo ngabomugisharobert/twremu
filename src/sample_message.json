@@ -22,7 +22,8 @@
             "ProcessCode": "TE-RWR2",
             "ItemCode": "1TE1900000012744",
             "StationSequenceNumber": 1,
-            "ResponseSignalCode": "RWR2_ID_RSP"
+            "ResponseSignalCode": "RWR2_ID_RSP",
+            "InfoString": ""
         },
         "SignalCode": "RWR2_ID",
         "SignalServiceNode": "WRAPLINE_IPC_NODE",
