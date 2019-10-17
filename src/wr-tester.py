@@ -161,6 +161,9 @@ def forward(x, nextSeqNbr):
     if "IsIdentification" in station and station["IsIdentification"] == True:
         msgdtl["SignalBody"]["InfoString"] = infostr
 
+    if "IsScaling" in station and station["IsScaling"] == True:
+        msgdtl["SignalBody"]["InfoString"] = infostr
+        
     msgdtl["SignalCode"] = signalCode
     
     # process and send the message
