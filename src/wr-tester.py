@@ -282,6 +282,8 @@ def printReply(reply):
     print("          |  ItemCode: " + reply["SignalData"]["ItemCode"])
     print("          |  StationSequenceNumber: " + str(reply["SignalData"]["StationSequenceNumber"]))
     print("          |  TransactionResult: " + str(reply["SignalData"]["TransactionResult"]))
+    if("InfoString " in reply["SignalData"] and str(reply["SignalData"]["InfoString "]) != ""):
+        print("          |  InfoString: " + str(reply["SignalData"]["InfoString "]))
     print()
 
 # The callback function gets called when MQ message is received
