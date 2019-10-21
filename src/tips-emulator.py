@@ -259,7 +259,18 @@ channel.queue_bind(exchange='Base.FromIpc.IpcToPts', queue='tips-emulator')
 
 if( result.method.message_count != 0):
     print("there are messages in queue ('tips-emulator') , messages " + str(result.method.message_count))
-    exit()
+    #exit()
+    choice = input(print('Do you want to Empty the queue: Y/N'))
+    #print('Press Y for Yes or N for not, just use Capital letter')
+    if choice =='Y':
+        channel.queue_purge(queue='tips-emulator')
+        print("queue is now empty")
+
+    elif choice =='N':
+        exit()
+    else:
+        print('GoodBye Let see soon')
+        exit()
 
 # Call start to set up globals
 print("Starting program")

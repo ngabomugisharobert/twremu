@@ -373,7 +373,18 @@ channel.queue_bind(exchange='Base.ToIpc.ToIpc', queue='wr-tester')
 
 if( result.method.message_count != 0):
     print("there are messages in queue ('wr-tester') , messages " + str(result.method.message_count))
-    exit()
+    #exit()
+    choice = input(print('Do you want to Empty the queue: Y/N'))
+    print('Press Y for Yes or N for not, just use Capital letter')
+    if choice =='Y':
+        channel.queue_purge(queue='wr-tester')
+        print("queue is now empty")
+
+    elif  choice =='N':
+        exit()
+    else:
+        print('GoodBye Let see soon')
+        exit()
 
 print('RabbitMQ setup complete')
 print()
