@@ -273,6 +273,10 @@ def printSend(msgdtl):
     print("   |  SignalCode: " + msgdtl["SignalCode"])
     print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
     print("   |  StationSequenceNumber: " + str(msgdtl["SignalBody"]["StationSequenceNumber"]))
+
+    if "InfoString" in msgdtl["SignalBody"]:
+        print("   |  InfoString: " + msgdtl["SignalBody"]["InfoString"])
+
     print()
 
 # Print details of received message.
@@ -282,6 +286,8 @@ def printReply(reply):
     print("          |  ItemCode: " + reply["SignalData"]["ItemCode"])
     print("          |  StationSequenceNumber: " + str(reply["SignalData"]["StationSequenceNumber"]))
     print("          |  TransactionResult: " + str(reply["SignalData"]["TransactionResult"]))
+    if("InfoString " in reply["SignalData"] and str(reply["SignalData"]["InfoString "]) != ""):
+        print("          |  InfoString: " + str(reply["SignalData"]["InfoString "]))
     print()
 
 # The callback function gets called when MQ message is received
