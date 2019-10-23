@@ -160,7 +160,11 @@ def forward(x, nextSeqNbr):
         
     if "IsIdentification" in station and station["IsIdentification"] == True:
         msgdtl["SignalBody"]["InfoString"] = infostr
+<<<<<<< HEAD
         
+=======
+
+>>>>>>> 779a044... InfoString improvements
     msgdtl["SignalCode"] = signalCode
     
     # process and send the message
@@ -273,6 +277,10 @@ def printSend(msgdtl):
     print("   |  SignalCode: " + msgdtl["SignalCode"])
     print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
     print("   |  StationSequenceNumber: " + str(msgdtl["SignalBody"]["StationSequenceNumber"]))
+
+    if "InfoString" in msgdtl["SignalBody"]:
+        print("   |  InfoString: " + msgdtl["SignalBody"]["InfoString"])
+
     print()
 
 # Print details of received message.
