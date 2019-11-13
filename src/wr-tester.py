@@ -50,19 +50,22 @@ def start():
 
     # Initiate situation  
     item = json.loads(rawItem)
+    #print(item)
     itemCodes = item["ItemCodes"]
+    #print(itemCodes)
     for item in itemCodes:
         situation.append(
                 {"ItemCode": item['ItemCode'],"InfoString": item["InfoString"], "StationSequenceNumber": None})
-        
+        #print(itemCodes)
+        Items = itemCodes
+        print(Items)
         #checking for Weight, Diameter and Width
-        if "ScaledNetWeight" in item:
-            situation[-1]["ScaledNetWeight"] = item["ScaledNetWeight"]
-        if "Width" in item:
-            situation[-1]["Width"] = item["Width"]
-        if "Diameter" in item:
-            situation[-1]["Diameter"] = item["Diameter"]    
-    
+        if "ItemCode" not in item:
+            print("Cannot process an item without an Itemcode")
+            exit()
+        if "stationSequenceNumber" not in item:
+            for item in itemCodes:
+                situation[-1]["StationSequenceNumber"] = None
             
     # Read and parse the config.json
     
@@ -222,11 +225,6 @@ def nextStep():
     # find first candidate that can be moved forward
     for i in candidates:
         seqNbr = i["StationSequenceNumber"]
-
-        if "Width" in i:
-            width = i["Width"]
-        if "Diameter" in i:
-            diameter = i["Diameter"]
         
         nextSeqNbr = 0
 
