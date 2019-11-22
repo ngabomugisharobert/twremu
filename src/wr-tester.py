@@ -53,19 +53,10 @@ def start():
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-                {"ItemCode": item['ItemCode'],"InfoString": item["InfoString"], "StationSequenceNumber": None})
+                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
         
-        #checking for Weight, Diameter and Width
-        if "ScaledNetWeight" in item:
-            situation[-1]["ScaledNetWeight"] = item["ScaledNetWeight"]
-        if "Width" in item:
-            situation[-1]["Width"] = item["Width"]
-        if "Diameter" in item:
-            situation[-1]["Diameter"] = item["Diameter"]    
-    
-            
-    # Read and parse the config.json
-    
+        for key in item.keys():
+            situation[-1][key] = item[key]
 
     # Initiate stations
     stationProperties = json.loads(rawConf)
@@ -90,14 +81,6 @@ def forward(x, nextSeqNbr):
     global itemCode
 
     itemCode = x["ItemCode"]
-    infostr = x["InfoString"]
-    if "ScaledNetWeight" in x:
-        scaledNetWeight = x["ScaledNetWeight"]
-    if "Width" in x:
-        width = x["Width"]
-
-    if "Diameter" in x:   
-        diameter = x["Diameter"]
 
     # get the desired station
     station = next(
@@ -147,19 +130,24 @@ def forward(x, nextSeqNbr):
 
     ts = time.time()
     msgdtl["UtcTimeStamp"] = ts
-    if "IsScaling" in station and station["IsScaling"] == True:
-        if "ScaledNetWeight" in x:
-            msgdtl["SignalBody"]["ScaledNetWeight"] = scaledNetWeight
-        if "Width" in x:
-            msgdtl["SignalBody"]["MeasuredWidth"] = width
-        if "Diameter" in x:
-            msgdtl["SignalBody"]["Diameter"] = diameter
+
+    for key in x.keys():
+        if key in ("ItemCode", "StationSequenceNumber"):
+            continue
+
+        if "IsIdentification" not in station or station["IsIdentification"] == False:
+            if key == "InfoString":
+                continue
+
+        if "IsScaling" not in station or station["IsScaling"] != True:
+            if key.startswith("Measured") or key.startswith("Scaled"):
+                continue
+
+        msgdtl["SignalBody"][key] = x[key]
 
     if "IsKickOut" in station and station["IsKickOut"] == True:
         msgdtl["SignalBody"]["KickOutFlag"] = "True"
         
-    if "IsIdentification" in station and station["IsIdentification"] == True:
-        msgdtl["SignalBody"]["InfoString"] = infostr
 
     msgdtl["SignalCode"] = signalCode
     
@@ -223,11 +211,6 @@ def nextStep():
     for i in candidates:
         seqNbr = i["StationSequenceNumber"]
 
-        if "Width" in i:
-            width = i["Width"]
-        if "Diameter" in i:
-            diameter = i["Diameter"]
-        
         nextSeqNbr = 0
 
         if seqNbr is None:
@@ -274,8 +257,11 @@ def printSend(msgdtl):
     print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
     print("   |  StationSequenceNumber: " + str(msgdtl["SignalBody"]["StationSequenceNumber"]))
 
-    if "InfoString" in msgdtl["SignalBody"]:
-        print("   |  InfoString: " + msgdtl["SignalBody"]["InfoString"])
+    for key in msgdtl["SignalBody"].keys():
+        if key in ("ItemCode", "StationSequenceNumber", "ProcessCode", "ResponseSignalCode"):
+            continue
+
+        print("   |  " + key + ": " + str(msgdtl["SignalBody"][key]))
 
     print()
 
@@ -324,7 +310,7 @@ def callback(ch, method, properties, body):
 
 # Start of initialization
 print('TIPS-Wrapline-Tester (wr-tester.py)')
-print('Version 2019.09.30')
+print('Version 2019.11.22')
 
 # Make a connection to MQ host
 
