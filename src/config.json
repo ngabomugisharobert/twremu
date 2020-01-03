@@ -9,13 +9,6 @@
     "ProcessCode": "TE-RWR2",
     "WorkstationCode": "WS-RWR2",
     "SleepDelay": 7,
-    "DriveThrough": {
-        "SignalCode": "RWR2_MO",
-        "CommandCode": "WRAPLINE_MOVE_W",
-        "CommandDescription": "Wrapline Move unit",
-        "WorkflowVersionCode": "WRAPLINE_MOVE",
-        "ResponseSignalCode": "RWR2_MO_RSP"
-    },
     "Stations": [{
             "StationSequenceNumber": 1,
             "SignalCode": "RWR2_ID",
@@ -44,20 +37,20 @@
         },
         {
             "StationSequenceNumber": 4,
-            "SignalCode": "RWR2_MO",
-            "CommandCode": "WRAPLINE_WRAP_W",
+            "SignalCode": "RWR2_LB",
+            "CommandCode": "WRAPLINE_LABEL_W",
             "CommandDescription": "Wrapline label of unit",
-            "WorkflowVersionCode": "WRAPLINE_MOVE",
-            "ResponseSignalCode": "RWR2_MO_RSP"
+            "WorkflowVersionCode": "WRAPLINE_LABEL",
+            "ResponseSignalCode": "RWR2_LB_RSP"
         },
         {
             "StationSequenceNumber": 5,
-            "SignalCode": "RWR2_MO",
-            "CommandCode": "WRAPLINE_WRAP_W",
-            "CommandDescription": "Wrapline exit (move) of unit",
-            "WorkflowVersionCode": "WRAPLINE_MOVE",
-            "ResponseSignalCode": "RWR2_MO_RSP",
-            "IsKickOut": true
+            "SignalCode": "RWR2_EX",
+            "CommandCode": "WRAPLINE_EXIT_W",
+            "CommandDescription": "Wrapline exit of unit",
+            "WorkflowVersionCode": "WRAPLINE_EXIT",
+            "ResponseSignalCode": "RWR2_EX_RSP",
+            "IsActive": false
         }
     ]
 }

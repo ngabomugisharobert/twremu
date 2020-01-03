@@ -1,14 +1,14 @@
 {
     "ItemCodes": [{
             "ItemCode": "350000000000000224",
-            "ScaledNetWeight": 5000,
-            "MeasuredWidth": 5050,
-            "MeasuredDiameter": 5000,
+            "ScaledNetWeight": 4000,
+            "MeasuredWidth": 1000,
+            "MeasuredDiameter": 1200,
             "InfoString": "From Tester 1"
         },
         {
             "ItemCode": "350000000000000225",
-            "ScaledNetWeight": 5000,
+            "ScaledNetWeight": 4001,
             "InfoString": "Tester Error 2"
         }
     ]

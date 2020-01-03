@@ -10,7 +10,6 @@ import time
 connectionString = 'localhost'
 situation = []
 stations = []
-failedUnits = []
 moveProperties = None
 itemCode = ""
 
@@ -76,7 +75,6 @@ def forward(x, nextSeqNbr):
     global channel
     global situation
     global stations
-    global failedUnits
     global moveProperties
     global itemCode
 
@@ -87,10 +85,7 @@ def forward(x, nextSeqNbr):
         p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
 
     propBase = None
-    if itemCode in failedUnits:
-        propBase = moveProperties["DriveThrough"]
-    else:
-        propBase = station
+    propBase = station
 
     signalCode = propBase["SignalCode"]
     commandCode = propBase["CommandCode"]
@@ -145,10 +140,6 @@ def forward(x, nextSeqNbr):
 
         msgdtl["SignalBody"][key] = x[key]
 
-    if "IsKickOut" in station and station["IsKickOut"] == True:
-        msgdtl["SignalBody"]["KickOutFlag"] = "True"
-        
-
     msgdtl["SignalCode"] = signalCode
     
     # process and send the message
@@ -184,7 +175,7 @@ def forward(x, nextSeqNbr):
     # update the situation
     match = next((x for x in situation if x["ItemCode"] == itemCode))
     match["StationSequenceNumber"] = nextSeqNbr
-    if "IsKickOut" in station and station["IsKickOut"] == True:
+    if "IsActive" in station and station["IsActive"] == False:
         situation.remove(match)
 
     print("Message sent, waiting for a response")
@@ -193,7 +184,6 @@ def forward(x, nextSeqNbr):
 def nextStep():
     global situation
     global stations
-    global failedUnits
 
     # Print current situaton
     printSituation(situation)
@@ -228,7 +218,7 @@ def nextStep():
             (x for x in stations if x["StationSequenceNumber"] == nextSeqNbr))
 
         isKickOut = False
-        if "IsKickOut" in nextStation and nextStation["IsKickOut"] == True:
+        if "IsActive" in nextStation and nextStation["IsActive"] == False:
             isKickOut = True
 
         match = next(
@@ -280,7 +270,6 @@ def printReply(reply):
 def callback(ch, method, properties, body):
     global channel
     global situation
-    global failedUnits
     global itemCode
 
     reply = json.loads(body)
@@ -298,10 +287,6 @@ def callback(ch, method, properties, body):
             if (item["ItemCode"] == itemCode):
                 item["ItemCode"] = reply["SignalData"]["ItemCode"]
 
-    if(str(reply["SignalData"]["TransactionResult"]) == "False"):
-        failedUnits.append(reply["SignalData"]["ItemCode"])
-        # sys.exit()
-
     # Call nextStep to evaluate next move. If none, exit.
     if not nextStep():
         print("Work is done. Bye!")
@@ -310,7 +295,7 @@ def callback(ch, method, properties, body):
 
 # Start of initialization
 print('TIPS-Wrapline-Tester (wr-tester.py)')
-print('Version 2019.11.22')
+print('Version 2020.01.03')
 
 # Make a connection to MQ host
 
