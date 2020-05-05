@@ -16,7 +16,8 @@
             "CommandDescription": "Wrapline identification of unit",
             "WorkflowVersionCode": "WRAPLINE_IDENTIFY",
             "ResponseSignalCode": "RWR2_ID_RSP",
-            "IsIdentification": true
+            "IsIdentification": true,
+            "IsMeasuring": true
         },
         {
             "StationSequenceNumber": 2,

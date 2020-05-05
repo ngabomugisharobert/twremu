@@ -134,8 +134,12 @@ def forward(x, nextSeqNbr):
             if key == "InfoString":
                 continue
 
+        if "IsMeasuring" not in station or station["IsMeasuring"] != True:
+            if key.startswith("Measured"):
+                continue
+
         if "IsScaling" not in station or station["IsScaling"] != True:
-            if key.startswith("Measured") or key.startswith("Scaled"):
+            if key.startswith("Scaled"):
                 continue
 
         msgdtl["SignalBody"][key] = x[key]
@@ -295,7 +299,7 @@ def callback(ch, method, properties, body):
 
 # Start of initialization
 print('TIPS-Wrapline-Tester (wr-tester.py)')
-print('Version 2020.01.03')
+print('Version 2020.05.05')
 
 # Make a connection to MQ host
 
