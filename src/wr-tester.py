@@ -13,11 +13,6 @@ stations = []
 moveProperties = None
 itemCode = ""
 
-# checking whether they is command line argument passed
-if(len(sys.argv) == 2):
-    config_choice = str(sys.argv[1])
-else:
-    config_choice == ""
 
 # The Id generator creates a new message id
 
@@ -37,9 +32,14 @@ def itemLoader():
 
 
 def configLoader():
-    if config_choice == 'met':
+
+    print("------------------------------------------------------------------------")
+    print(str(sys.argv[2]))
+    print(len(sys.argv))
+    print("------------------------------------------------------------------------")
+    if len(sys.argv) == 3 and str(sys.argv[1]) == "-config":
         # loading config.json
-        file = open("config_RWR3.json", "r")
+        file = open(str(sys.argv[2]), "r")
     else:
         # loading config.json
         file = open("config.json", "r")
