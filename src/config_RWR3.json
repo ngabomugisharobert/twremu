@@ -1,0 +1,50 @@
+{
+  "Rabbitmq": {
+    "User": "guest",
+    "Password": "guest",
+    "Host": "localhost",
+    "Port": 5672,
+    "VirtualHost": "/"
+  },
+  "ProcessCode": "TE-RWR3",
+  "WorkstationCode": "WS-RWR2",
+  "SleepDelay": 7,
+  "Stations": [
+    {
+      "StationSequenceNumber": 1,
+      "SignalCode": "RWR2_ID",
+      "CommandCode": "WRAPLINE_IDENTIFY_W",
+      "CommandDescription": "Wrapline identification of unit",
+      "WorkflowVersionCode": "WRAPLINE_IDENTIFY",
+      "ResponseSignalCode": "RWR3_ID_RSP",
+      "IsIdentification": true,
+      "IsMeasuring": true
+    },
+    {
+      "StationSequenceNumber": 2,
+      "SignalCode": "RWR2_ME",
+      "CommandCode": "WRAPLINE_MEASURE_W",
+      "CommandDescription": "Wrapline measure of unit",
+      "WorkflowVersionCode": "WRAPLINE_MEASURE",
+      "ResponseSignalCode": "RWR3_ME_RSP",
+      "IsScaling": true
+    },
+    {
+      "StationSequenceNumber": 3,
+      "SignalCode": "RWR2_WR",
+      "CommandCode": "WRAPLINE_WRAP_W",
+      "CommandDescription": "Wrapline wrap of unit",
+      "WorkflowVersionCode": "WRAPLINE_WRAP",
+      "ResponseSignalCode": "RWR3_WR_RSP"
+    },
+    {
+      "StationSequenceNumber": 4,
+      "SignalCode": "RWR2_EX",
+      "CommandCode": "WRAPLINE_EXIT_W",
+      "CommandDescription": "Wrapline exit of unit",
+      "WorkflowVersionCode": "WRAPLINE_EXIT",
+      "ResponseSignalCode": "RWR3_EX_RSP",
+      "IsActive": false
+    }
+  ]
+}
