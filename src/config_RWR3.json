@@ -12,7 +12,7 @@
   "Stations": [
     {
       "StationSequenceNumber": 1,
-      "SignalCode": "RWR2_ID",
+      "SignalCode": "RWR3_ID",
       "CommandCode": "WRAPLINE_IDENTIFY_W",
       "CommandDescription": "Wrapline identification of unit",
       "WorkflowVersionCode": "WRAPLINE_IDENTIFY",
@@ -22,7 +22,7 @@
     },
     {
       "StationSequenceNumber": 2,
-      "SignalCode": "RWR2_ME",
+      "SignalCode": "RWR3_ME",
       "CommandCode": "WRAPLINE_MEASURE_W",
       "CommandDescription": "Wrapline measure of unit",
       "WorkflowVersionCode": "WRAPLINE_MEASURE",
@@ -31,7 +31,7 @@
     },
     {
       "StationSequenceNumber": 3,
-      "SignalCode": "RWR2_WR",
+      "SignalCode": "RWR3_WR",
       "CommandCode": "WRAPLINE_WRAP_W",
       "CommandDescription": "Wrapline wrap of unit",
       "WorkflowVersionCode": "WRAPLINE_WRAP",
@@ -39,7 +39,7 @@
     },
     {
       "StationSequenceNumber": 4,
-      "SignalCode": "RWR2_EX",
+      "SignalCode": "RWR3_EX",
       "CommandCode": "WRAPLINE_EXIT_W",
       "CommandDescription": "Wrapline exit of unit",
       "WorkflowVersionCode": "WRAPLINE_EXIT",
