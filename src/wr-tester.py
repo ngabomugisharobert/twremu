@@ -1,10 +1,10 @@
-import pika
-import sys
-import json
-import time
-import string
 import random
+import string
 import time
+import json
+import sys
+import pika
+
 
 # define globals
 connectionString = 'localhost'
@@ -12,8 +12,12 @@ situation = []
 stations = []
 moveProperties = None
 itemCode = ""
-config_choice = input(
-    'Which wrapline are you testing: F/S \n Press F for First wrapline or S for Second wrapline, just use Capital letter \n')
+
+# checking whether they is command line argument passed
+if(len(sys.argv) == 2):
+    config_choice = str(sys.argv[1])
+else:
+    config_choice == ""
 
 # The Id generator creates a new message id
 
@@ -33,14 +37,12 @@ def itemLoader():
 
 
 def configLoader():
-    if config_choice == 'F':
+    if config_choice == 'met':
         # loading config.json
-        file = open("config_RWR2.json", "r")
-    elif config_choice == 'S':
-        file = open('config_RWR3.json', 'r')
+        file = open("config_RWR3.json", "r")
     else:
-        print('invalid choice run again')
-        exit()
+        # loading config.json
+        file = open("config.json", "r")
 
     RawConf = file.read()
     file.close()
