@@ -39,6 +39,14 @@
     },
     {
       "StationSequenceNumber": 4,
+      "SignalCode": "RWR2_LB",
+      "CommandCode": "WRAPLINE_LABEL_W",
+      "CommandDescription": "Wrapline label of unit",
+      "WorkflowVersionCode": "WRAPLINE_LABEL",
+      "ResponseSignalCode": "RWR2_LB_RSP"
+    },
+    {
+      "StationSequenceNumber": 5,
       "SignalCode": "RWR2_EX",
       "CommandCode": "WRAPLINE_EXIT_W",
       "CommandDescription": "Wrapline exit of unit",
