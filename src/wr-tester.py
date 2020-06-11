@@ -33,10 +33,6 @@ def itemLoader():
 
 def configLoader():
 
-    print("------------------------------------------------------------------------")
-    print(str(sys.argv[2]))
-    print(len(sys.argv))
-    print("------------------------------------------------------------------------")
     if len(sys.argv) == 3 and str(sys.argv[1]) == "-config":
         # loading config.json
         file = open(str(sys.argv[2]), "r")
