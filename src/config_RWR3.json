@@ -6,52 +6,44 @@
     "Port": 5672,
     "VirtualHost": "/"
   },
-  "ProcessCode": "TE-RWR2",
+  "ProcessCode": "TE-RWR3",
   "WorkstationCode": "WS-RWR2",
   "SleepDelay": 7,
   "Stations": [
     {
       "StationSequenceNumber": 1,
-      "SignalCode": "RWR2_ID",
+      "SignalCode": "RWR3_ID",
       "CommandCode": "WRAPLINE_IDENTIFY_W",
       "CommandDescription": "Wrapline identification of unit",
       "WorkflowVersionCode": "WRAPLINE_IDENTIFY",
-      "ResponseSignalCode": "RWR2_ID_RSP",
+      "ResponseSignalCode": "RWR3_ID_RSP",
       "IsIdentification": true,
       "IsMeasuring": true
     },
     {
       "StationSequenceNumber": 2,
-      "SignalCode": "RWR2_ME",
+      "SignalCode": "RWR3_ME",
       "CommandCode": "WRAPLINE_MEASURE_W",
       "CommandDescription": "Wrapline measure of unit",
       "WorkflowVersionCode": "WRAPLINE_MEASURE",
-      "ResponseSignalCode": "RWR2_ME_RSP",
+      "ResponseSignalCode": "RWR3_ME_RSP",
       "IsScaling": true
     },
     {
       "StationSequenceNumber": 3,
-      "SignalCode": "RWR2_WR",
+      "SignalCode": "RWR3_WR",
       "CommandCode": "WRAPLINE_WRAP_W",
       "CommandDescription": "Wrapline wrap of unit",
       "WorkflowVersionCode": "WRAPLINE_WRAP",
-      "ResponseSignalCode": "RWR2_WR_RSP"
+      "ResponseSignalCode": "RWR3_WR_RSP"
     },
     {
       "StationSequenceNumber": 4,
-      "SignalCode": "RWR2_LB",
-      "CommandCode": "WRAPLINE_LABEL_W",
-      "CommandDescription": "Wrapline label of unit",
-      "WorkflowVersionCode": "WRAPLINE_LABEL",
-      "ResponseSignalCode": "RWR2_LB_RSP"
-    },
-    {
-      "StationSequenceNumber": 5,
-      "SignalCode": "RWR2_EX",
+      "SignalCode": "RWR3_EX",
       "CommandCode": "WRAPLINE_EXIT_W",
       "CommandDescription": "Wrapline exit of unit",
       "WorkflowVersionCode": "WRAPLINE_EXIT",
-      "ResponseSignalCode": "RWR2_EX_RSP",
+      "ResponseSignalCode": "RWR3_EX_RSP",
       "IsActive": false
     }
   ]

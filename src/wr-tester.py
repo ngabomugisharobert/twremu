@@ -1,10 +1,10 @@
-import pika
-import sys
-import json
-import time
-import string
 import random
+import string
 import time
+import json
+import sys
+import pika
+
 
 # define globals
 connectionString = 'localhost'
@@ -12,6 +12,7 @@ situation = []
 stations = []
 moveProperties = None
 itemCode = ""
+
 
 # The Id generator creates a new message id
 
@@ -21,20 +22,28 @@ def id_generator(size=15, chars=string.ascii_letters + string.digits):
 
 # The loader function reads both item and config json files
 
+
 def itemLoader():
-    #loading item.json
+    # loading item.json
     file = open("item.json", "r")
     RawItem = file.read()
     file.close()
     return RawItem
 
+
 def configLoader():
-    #loading config.json
-    file = open("config.json", "r")
+
+    if len(sys.argv) == 3 and str(sys.argv[1]) == "-config":
+        # loading config.json
+        file = open(str(sys.argv[2]), "r")
+    else:
+        # loading config.json
+        file = open("config.json", "r")
+
     RawConf = file.read()
     file.close()
     return RawConf
-    
+
 
 # The start function initiates the program.
 
@@ -47,13 +56,13 @@ def start():
     # Read and parse the item.json
     rawItem = itemLoader()
 
-    # Initiate situation  
+    # Initiate situation
     item = json.loads(rawItem)
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-                {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
-        
+            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
+
         for key in item.keys():
             situation[-1][key] = item[key]
 
@@ -145,7 +154,7 @@ def forward(x, nextSeqNbr):
         msgdtl["SignalBody"][key] = x[key]
 
     msgdtl["SignalCode"] = signalCode
-    
+
     # process and send the message
     hdr = {}
     if "SenderApplicationCode" in hdrs:
@@ -167,7 +176,6 @@ def forward(x, nextSeqNbr):
     key = key.replace('Tips.Base.Messages.', '')
     key = key.replace('Message', '')
 
-    
     printSend(msgdtl)
 
     channel.basic_publish(exchange='(TIX Hub)',
@@ -185,6 +193,8 @@ def forward(x, nextSeqNbr):
     print("Message sent, waiting for a response")
 
 # The nextStep function gets called to make next move in the program.
+
+
 def nextStep():
     global situation
     global stations
@@ -230,11 +240,12 @@ def nextStep():
         if match is None or isKickOut == True:
             forward(i, nextSeqNbr)
             return True
-        
 
     return False
 
 # Print details of current situation.
+
+
 def printSituation(situation):
     print("------------------------- ")
     print("Current situation: ")
@@ -245,11 +256,14 @@ def printSituation(situation):
     print()
 
 # Print details of sent message.
+
+
 def printSend(msgdtl):
     print("  Sending Message:         ===> ")
     print("   |  SignalCode: " + msgdtl["SignalCode"])
     print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
-    print("   |  StationSequenceNumber: " + str(msgdtl["SignalBody"]["StationSequenceNumber"]))
+    print("   |  StationSequenceNumber: " +
+          str(msgdtl["SignalBody"]["StationSequenceNumber"]))
 
     for key in msgdtl["SignalBody"].keys():
         if key in ("ItemCode", "StationSequenceNumber", "ProcessCode", "ResponseSignalCode"):
@@ -260,17 +274,24 @@ def printSend(msgdtl):
     print()
 
 # Print details of received message.
+
+
 def printReply(reply):
     print("   <===   Message received: ")
     print("          |  SignalCode: " + reply["SignalCode"])
     print("          |  ItemCode: " + reply["SignalData"]["ItemCode"])
-    print("          |  StationSequenceNumber: " + str(reply["SignalData"]["StationSequenceNumber"]))
-    print("          |  TransactionResult: " + str(reply["SignalData"]["TransactionResult"]))
+    print("          |  StationSequenceNumber: " +
+          str(reply["SignalData"]["StationSequenceNumber"]))
+    print("          |  TransactionResult: " +
+          str(reply["SignalData"]["TransactionResult"]))
     if("InfoString" in reply["SignalData"] and str(reply["SignalData"]["InfoString"]) != ""):
-        print("          |  InfoString: " + str(reply["SignalData"]["InfoString"]))
+        print("          |  InfoString: " +
+              str(reply["SignalData"]["InfoString"]))
     print()
 
 # The callback function gets called when MQ message is received
+
+
 def callback(ch, method, properties, body):
     global channel
     global situation
@@ -311,8 +332,8 @@ rabbitmq = connectionProperties["Rabbitmq"]
 
 user = rabbitmq["User"]
 password = rabbitmq["Password"]
-host = rabbitmq["Host"] 
-port = rabbitmq["Port"] 
+host = rabbitmq["Host"]
+port = rabbitmq["Port"]
 virtualHost = rabbitmq["VirtualHost"]
 
 credentials = pika.PlainCredentials(user, password)
@@ -352,16 +373,17 @@ result = channel.queue_declare(queue='wr-tester')
 print('Creating binding "Base.ToIpc.ToIpc" -> "wr-tester"')
 channel.queue_bind(exchange='Base.ToIpc.ToIpc', queue='wr-tester')
 
-if( result.method.message_count != 0):
-    print("there are messages in queue ('wr-tester') , messages " + str(result.method.message_count))
-    #exit()
+if(result.method.message_count != 0):
+    print("there are messages in queue ('wr-tester') , messages " +
+          str(result.method.message_count))
+    # exit()
     choice = input(print('Do you want to Empty the queue: Y/N'))
     print('Press Y for Yes or N for not, just use Capital letter')
-    if choice =='Y':
+    if choice == 'Y':
         channel.queue_purge(queue='wr-tester')
         print("queue is now empty")
 
-    elif  choice =='N':
+    elif choice == 'N':
         exit()
     else:
         print('GoodBye Let see soon')
