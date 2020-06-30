@@ -1,0 +1,49 @@
+{
+  "Rabbitmq": {
+    "User": "guest",
+    "Password": "guest",
+    "Host": "localhost",
+    "Port": 5672,
+    "VirtualHost": "/"
+  },
+  "ProcessCode": "MNTRP1",
+  "WorkstationCode": "WS-RWR2",
+  "SleepDelay": 7,
+  "Stations": [
+    {
+      "StationSequenceNumber": 1,
+      "SignalCode": "MNT1_ID",
+      "CommandCode": "WRAPLINE_IDENTIFY_W",
+      "CommandDescription": "Wrapline identification of unit",
+      "WorkflowVersionCode": "WRAPLINE_IDENT_RP1",
+      "ResponseSignalCode": "MNT1_ID_RSP",
+      "IsIdentification": true
+    },
+    {
+      "StationSequenceNumber": 2,
+      "SignalCode": "MNT1_SC",
+      "CommandCode": "WRAPLINE_MEASURE_W",
+      "CommandDescription": "Wrapline measure of unit",
+      "WorkflowVersionCode": "WRAPLINE_SCALE_RP1",
+      "ResponseSignalCode": "MNT1_SC_RSP",
+      "IsScaling": true
+    },
+    {
+      "StationSequenceNumber": 3,
+      "SignalCode": "MNT1_LB",
+      "CommandCode": "WRAPLINE_LABEL_W",
+      "CommandDescription": "Wrapline wrap of unit",
+      "WorkflowVersionCode": "WRAPLINE_LABEL_RP1",
+      "ResponseSignalCode": "MNT1_LB_RSP"
+    },
+    {
+      "StationSequenceNumber": 4,
+      "SignalCode": "MNT1_EX",
+      "CommandCode": "WRAPLINE_EXIT_W",
+      "CommandDescription": "Wrapline exit of unit",
+      "WorkflowVersionCode": "WRAPLINE_EXIT_RP1",
+      "ResponseSignalCode": "MNT1_EX_RSP",
+      "IsActive": false
+    }
+  ]
+}
