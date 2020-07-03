@@ -9,6 +9,14 @@
   "ProcessCode": "TE-RWR2",
   "WorkstationCode": "WS-RWR2",
   "SleepDelay": 7,
+  "Reset": {
+      "SignalCode": "RWR2_RT",
+      "CommandCode": "WRAPLINE_EXIT_W",
+      "CommandDescription": "Wrapline Reset",
+      "WorkflowVersionCode": "WRAPLINE_RESET",
+      "ResponseSignalCode": "RWR2_RT_RSP",
+      "IsActive": false
+  },
   "Stations": [
     {
       "StationSequenceNumber": 1,
