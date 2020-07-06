@@ -9,6 +9,13 @@
   "ProcessCode": "MNTRP1",
   "WorkstationCode": "WS-RWR2",
   "SleepDelay": 7,
+  "Reset": {
+      "SignalCode": "RWR2_RT",
+      "CommandCode": "WRAPLINE_RESET_W",
+      "CommandDescription": "Wrapline Reset",
+      "WorkflowVersionCode": "WRAPLINE_RESET_RP1",
+      "ResponseSignalCode": "RWR2_RT_RSP"
+  },
   "Stations": [
     {
       "StationSequenceNumber": 1,
