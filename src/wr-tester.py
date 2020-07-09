@@ -61,7 +61,7 @@ def start():
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
+            {"ItemCode": item['ItemCode'], "SequenceNumber": None})
 
         for key in item.keys():
             situation[-1][key] = item[key]
@@ -187,7 +187,7 @@ def forward(x, nextSeqNbr):
 
     # update the situation
     match = next((x for x in situation if x["ItemCode"] == itemCode))
-    match["StationSequenceNumber"] = nextSeqNbr
+    match["SequenceNumber"] = nextSeqNbr
     if "IsActive" in station and station["IsActive"] == False:
         situation.remove(match)
 
@@ -206,7 +206,7 @@ def nextStep():
     # find highest possible entry candidate to the wrapping line
     candidates = []
     for i in situation:
-        if i["StationSequenceNumber"] is not None:
+        if i["SequenceNumber"] is not None:
             candidates.insert(0, i)
         else:
             candidates.insert(0, i)
@@ -214,7 +214,7 @@ def nextStep():
 
     # find first candidate that can be moved forward
     for i in candidates:
-        seqNbr = i["StationSequenceNumber"]
+        seqNbr = i["SequenceNumber"]
 
         nextSeqNbr = 0
 
@@ -237,7 +237,7 @@ def nextStep():
             isKickOut = True
 
         match = next(
-            (x for x in candidates if x["StationSequenceNumber"] == nextSeqNbr), None)
+            (x for x in candidates if x["SequenceNumber"] == nextSeqNbr), None)
         if match is None or isKickOut == True:
             forward(i, nextSeqNbr)
             return True
@@ -252,7 +252,7 @@ def printSituation(situation):
     print("Current situation: ")
     print("Station\tUnit")
     for i in situation:
-        print(str(i["StationSequenceNumber"]) + "\t" + i["ItemCode"])
+        print(str(i["SequenceNumber"]) + "\t" + i["ItemCode"])
     print("------------------------- ")
     print()
 
