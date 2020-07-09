@@ -38,7 +38,7 @@ def configLoader():
         file = open(str(sys.argv[2]), "r")
     else:
         # loading config.json
-        file = open("config.json", "r")
+        file = open("config_MNTRP1.json", "r")
 
     RawConf = file.read()
     file.close()
@@ -91,7 +91,7 @@ def forward(x, nextSeqNbr):
 
     # get the desired station
     station = next(
-        p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
+        p for p in stations if p["SequenceNumber"] == nextSeqNbr)
 
     propBase = None
     propBase = station
@@ -126,6 +126,7 @@ def forward(x, nextSeqNbr):
     msgdtl["Command"]["WorkflowVersionCode"] = workflowVersionCode
     msgdtl["SignalBody"]["ItemCode"] = itemCode
     msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
+    msgdtl["SignalBody"]["SequenceNumber"] = nextSeqNbr
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
     msgdtl["SignalBody"]["ProcessCode"] = proCode
     msgdtl["ProcessCode"] = proCode
@@ -218,18 +219,18 @@ def nextStep():
         nextSeqNbr = 0
 
         if seqNbr is None:
-            nextSeqNbr = stations[0]["StationSequenceNumber"]
+            nextSeqNbr = stations[0]["SequenceNumber"]
         else:
             station = next(
-                (x for x in stations if x["StationSequenceNumber"] == seqNbr))
+                (x for x in stations if x["SequenceNumber"] == seqNbr))
             index = stations.index(station)
             if index + 1 >= len(stations):
                 continue
 
-            nextSeqNbr = stations[index+1]["StationSequenceNumber"]
+            nextSeqNbr = stations[index+1]["SequenceNumber"]
 
         nextStation = next(
-            (x for x in stations if x["StationSequenceNumber"] == nextSeqNbr))
+            (x for x in stations if x["SequenceNumber"] == nextSeqNbr))
 
         isKickOut = False
         if "IsActive" in nextStation and nextStation["IsActive"] == False:
@@ -264,6 +265,8 @@ def printSend(msgdtl):
     print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
     print("   |  StationSequenceNumber: " +
           str(msgdtl["SignalBody"]["StationSequenceNumber"]))
+    print("   |  SequenceNumber: " +
+          str(msgdtl["SignalBody"]["SequenceNumber"]))
 
     for key in msgdtl["SignalBody"].keys():
         if key in ("ItemCode", "StationSequenceNumber", "ProcessCode", "ResponseSignalCode"):
@@ -282,6 +285,8 @@ def printReply(reply):
     print("          |  ItemCode: " + reply["SignalData"]["ItemCode"])
     print("          |  StationSequenceNumber: " +
           str(reply["SignalData"]["StationSequenceNumber"]))
+    print("          |  SequenceNumber: " +
+          str(reply["SignalData"]["SequenceNumber"]))
     print("          |  TransactionResult: " +
           str(reply["SignalData"]["TransactionResult"]))
     if("InfoString" in reply["SignalData"] and str(reply["SignalData"]["InfoString"]) != ""):

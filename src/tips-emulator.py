@@ -25,7 +25,7 @@ def start():
 
     global drive
     # Read and parse the config.json
-    file = open("config.json", "r")
+    file = open("config_MNTRP1.json", "r")
     rawConf = file.read()
     file.close()
 
@@ -35,6 +35,8 @@ def start():
     properties = stationProperties["Stations"]
     for property in properties:
         stations.append(property)
+
+    print(stations)
 
 # The reply function sends a reply message back to the tester.
 
