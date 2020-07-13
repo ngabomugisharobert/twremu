@@ -19,7 +19,6 @@
   "Stations": [
     {
       "StationSequenceNumber": 1,
-      "SequenceNumber": 1,
       "SignalCode": "MNT1_ID",
       "CommandCode": "WRAPLINE_IDENTIFY_W",
       "CommandDescription": "Wrapline identification of unit",
@@ -29,7 +28,6 @@
     },
     {
       "StationSequenceNumber": 2,
-      "SequenceNumber": 2,
       "SignalCode": "MNT1_SC",
       "CommandCode": "WRAPLINE_MEASURE_W",
       "CommandDescription": "Wrapline measure of unit",
@@ -39,9 +37,8 @@
     },
     {
       "StationSequenceNumber": 2,
-      "SequenceNumber": 3,
       "SignalCode": "MNT1_WR",
-      "CommandCode": "WRAPLINE_MEASURE_W",
+      "CommandCode": "WRAPLINE_REQUEST_W",
       "CommandDescription": "Wrapline measure of unit",
       "WorkflowVersionCode": "WRAPLINE_WEIGHT_REQ_RP1",
       "ResponseSignalCode": "MNT1_WR_RSP",
@@ -49,16 +46,14 @@
     },
     {
       "StationSequenceNumber": 3,
-      "SequenceNumber": 4,
       "SignalCode": "MNT1_LB",
-      "CommandCode": "WRAPLINE_LABEL_WR",
+      "CommandCode": "WRAPLINE_LABEL_W",
       "CommandDescription": "Wrapline wrap of unit",
       "WorkflowVersionCode": "WRAPLINE_LABEL_RP1",
       "ResponseSignalCode": "MNT1_LB_RSP"
     },
     {
       "StationSequenceNumber": 4,
-      "SequenceNumber": 5,
       "SignalCode": "MNT1_EX",
       "CommandCode": "WRAPLINE_EXIT_W",
       "CommandDescription": "Wrapline exit of unit",

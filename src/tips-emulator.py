@@ -35,6 +35,9 @@ def start():
     properties = stationProperties["Stations"]
     for property in properties:
         stations.append(property)
+    # add internal sequence number
+    for station in stations:
+        station["SequenceNumber"] = stations.index(station)+1 
 
     print(stations)
 
@@ -134,16 +137,16 @@ def businessRules(signalCode, signalCodeResponse, itemCode, sequenceNumber, situ
     # 2nd rule checking
     ms = " this item has signalCode that does not match the station, something is wrong here."
     signal = next((p["SignalCode"]
-                   for p in stations if p["StationSequenceNumber"] == sequenceNumber))
+                   for p in stations if p["SequenceNumber"] == sequenceNumber))
     if signalCode == signal or signalCode == drive["DriveThrough"]["SignalCode"]:
         print(" ACCEPTED ", signalCode, " to STATION ", next(
-            (p["StationSequenceNumber"] for p in stations if p["StationSequenceNumber"] == sequenceNumber)))
+            (p["StationSequenceNumber"] for p in stations if p["SequenceNumber"] == sequenceNumber)))
     else:
         error(signalCodeResponse, itemCode, sequenceNumber, ms)
 
     # 4th rule
     station = next(
-        (i for i in stations if i["StationSequenceNumber"] == sequenceNumber), None)
+        (i for i in stations if i["SequenceNumber"] == sequenceNumber), None)
     item = next((i for i in situation if i["ItemCode"] == itemCode), None)
     ms = "the ID station already has this unit Item : ", itemCode, " in a Queue"
     if "IsIdentification" in station.keys() and station["IsIdentification"] == True and item is not None:

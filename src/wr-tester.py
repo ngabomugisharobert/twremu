@@ -38,7 +38,7 @@ def configLoader():
         file = open(str(sys.argv[2]), "r")
     else:
         # loading config.json
-        file = open("config_MNTRP1.json", "r")
+        file = open("config.json", "r")
 
     RawConf = file.read()
     file.close()
@@ -61,7 +61,7 @@ def start():
     itemCodes = item["ItemCodes"]
     for item in itemCodes:
         situation.append(
-            {"ItemCode": item['ItemCode'], "SequenceNumber": None})
+            {"ItemCode": item['ItemCode'], "StationSequenceNumber": None})
 
         for key in item.keys():
             situation[-1][key] = item[key]
@@ -73,6 +73,9 @@ def start():
     # moveProperties.append(str(stationProperties["DriveThrough"]))
     for property in properties:
         stations.append(property)
+    # add internal sequence number
+    for station in stations:
+        station["SequenceNumber"] = stations.index(station)+1 
 
     # Send first message
     nextStep()
@@ -125,8 +128,7 @@ def forward(x, nextSeqNbr):
     msgdtl["Command"]["CommandDescription"] = commandDescription
     msgdtl["Command"]["WorkflowVersionCode"] = workflowVersionCode
     msgdtl["SignalBody"]["ItemCode"] = itemCode
-    msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
-    msgdtl["SignalBody"]["SequenceNumber"] = nextSeqNbr
+    msgdtl["SignalBody"]["StationSequenceNumber"] = station["StationSequenceNumber"]
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
     msgdtl["SignalBody"]["ProcessCode"] = proCode
     msgdtl["ProcessCode"] = proCode
@@ -187,7 +189,7 @@ def forward(x, nextSeqNbr):
 
     # update the situation
     match = next((x for x in situation if x["ItemCode"] == itemCode))
-    match["SequenceNumber"] = nextSeqNbr
+    match["StationSequenceNumber"] = nextSeqNbr
     if "IsActive" in station and station["IsActive"] == False:
         situation.remove(match)
 
@@ -206,7 +208,7 @@ def nextStep():
     # find highest possible entry candidate to the wrapping line
     candidates = []
     for i in situation:
-        if i["SequenceNumber"] is not None:
+        if i["StationSequenceNumber"] is not None:
             candidates.insert(0, i)
         else:
             candidates.insert(0, i)
@@ -214,7 +216,7 @@ def nextStep():
 
     # find first candidate that can be moved forward
     for i in candidates:
-        seqNbr = i["SequenceNumber"]
+        seqNbr = i["StationSequenceNumber"]
 
         nextSeqNbr = 0
 
@@ -237,7 +239,7 @@ def nextStep():
             isKickOut = True
 
         match = next(
-            (x for x in candidates if x["SequenceNumber"] == nextSeqNbr), None)
+            (x for x in candidates if x["StationSequenceNumber"] == nextSeqNbr), None)
         if match is None or isKickOut == True:
             forward(i, nextSeqNbr)
             return True
@@ -252,7 +254,7 @@ def printSituation(situation):
     print("Current situation: ")
     print("Station\tUnit")
     for i in situation:
-        print(str(i["SequenceNumber"]) + "\t" + i["ItemCode"])
+        print(str(i["StationSequenceNumber"]) + "\t" + i["ItemCode"])
     print("------------------------- ")
     print()
 
@@ -265,8 +267,6 @@ def printSend(msgdtl):
     print("   |  ItemCode: " + msgdtl["SignalBody"]["ItemCode"])
     print("   |  StationSequenceNumber: " +
           str(msgdtl["SignalBody"]["StationSequenceNumber"]))
-    print("   |  SequenceNumber: " +
-          str(msgdtl["SignalBody"]["SequenceNumber"]))
 
     for key in msgdtl["SignalBody"].keys():
         if key in ("ItemCode", "StationSequenceNumber", "ProcessCode", "ResponseSignalCode"):
@@ -285,8 +285,6 @@ def printReply(reply):
     print("          |  ItemCode: " + reply["SignalData"]["ItemCode"])
     print("          |  StationSequenceNumber: " +
           str(reply["SignalData"]["StationSequenceNumber"]))
-    print("          |  SequenceNumber: " +
-          str(reply["SignalData"]["SequenceNumber"]))
     print("          |  TransactionResult: " +
           str(reply["SignalData"]["TransactionResult"]))
     if("InfoString" in reply["SignalData"] and str(reply["SignalData"]["InfoString"]) != ""):
