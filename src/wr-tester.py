@@ -33,7 +33,7 @@ def itemLoader():
 
 def configLoader():
 
-    if len(sys.argv) == 3 and str(sys.argv[1]) == "-config":
+    if len(sys.argv) == 3 and (str(sys.argv[1]) == "--config" or str(sys.argv[1]) == "-c"):
         # loading config.json
         file = open(str(sys.argv[2]), "r")
     else:
@@ -73,6 +73,9 @@ def start():
     # moveProperties.append(str(stationProperties["DriveThrough"]))
     for property in properties:
         stations.append(property)
+    # add internal sequence number
+    for station in stations:
+        station["SequenceNumber"] = stations.index(station)+1 
 
     # Send first message
     nextStep()
@@ -91,7 +94,7 @@ def forward(x, nextSeqNbr):
 
     # get the desired station
     station = next(
-        p for p in stations if p["StationSequenceNumber"] == nextSeqNbr)
+        p for p in stations if p["SequenceNumber"] == nextSeqNbr)
 
     propBase = None
     propBase = station
@@ -125,7 +128,7 @@ def forward(x, nextSeqNbr):
     msgdtl["Command"]["CommandDescription"] = commandDescription
     msgdtl["Command"]["WorkflowVersionCode"] = workflowVersionCode
     msgdtl["SignalBody"]["ItemCode"] = itemCode
-    msgdtl["SignalBody"]["StationSequenceNumber"] = nextSeqNbr
+    msgdtl["SignalBody"]["StationSequenceNumber"] = station["StationSequenceNumber"]
     msgdtl["SignalBody"]["ResponseSignalCode"] = responseSignalCode
     msgdtl["SignalBody"]["ProcessCode"] = proCode
     msgdtl["ProcessCode"] = proCode
@@ -136,7 +139,7 @@ def forward(x, nextSeqNbr):
     msgdtl["UtcTimeStamp"] = ts
 
     for key in x.keys():
-        if key in ("ItemCode", "StationSequenceNumber"):
+        if key in ("ItemCode", "StationSequenceNumber", "SequenceNumber"):
             continue
 
         if "IsIdentification" not in station or station["IsIdentification"] == False:
@@ -218,18 +221,18 @@ def nextStep():
         nextSeqNbr = 0
 
         if seqNbr is None:
-            nextSeqNbr = stations[0]["StationSequenceNumber"]
+            nextSeqNbr = stations[0]["SequenceNumber"]
         else:
             station = next(
-                (x for x in stations if x["StationSequenceNumber"] == seqNbr))
+                (x for x in stations if x["SequenceNumber"] == seqNbr))
             index = stations.index(station)
             if index + 1 >= len(stations):
                 continue
 
-            nextSeqNbr = stations[index+1]["StationSequenceNumber"]
+            nextSeqNbr = stations[index+1]["SequenceNumber"]
 
         nextStation = next(
-            (x for x in stations if x["StationSequenceNumber"] == nextSeqNbr))
+            (x for x in stations if x["SequenceNumber"] == nextSeqNbr))
 
         isKickOut = False
         if "IsActive" in nextStation and nextStation["IsActive"] == False:
@@ -287,6 +290,13 @@ def printReply(reply):
     if("InfoString" in reply["SignalData"] and str(reply["SignalData"]["InfoString"]) != ""):
         print("          |  InfoString: " +
               str(reply["SignalData"]["InfoString"]))
+
+    for key in reply["SignalData"].keys():
+        if key in ("SignalCode", "ItemCode", "StationSequenceNumber", "TransactionResult", "InfoString", "ProcessCode"):
+            continue
+
+        print("          |  " + key + ": " + str(reply["SignalData"][key]))
+
     print()
 
 # The callback function gets called when MQ message is received

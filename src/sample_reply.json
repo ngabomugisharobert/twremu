@@ -8,6 +8,7 @@
             "ProcessCode": "TE-RWR2",
             "ItemCode": "0TE1900000012744",
             "StationSequenceNumber": "1",
+            "SequenceNumber": "1",
             "TransactionResult": "True"
         },
         "SignalServiceNode": "WRAPLINE_IPC_NODE",
