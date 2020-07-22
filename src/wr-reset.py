@@ -21,7 +21,7 @@ def id_generator(size=15, chars=string.ascii_letters + string.digits):
 
 def configLoader():
 
-    if len(sys.argv) == 3 and str(sys.argv[1]) == "-config":
+    if len(sys.argv) == 3 and (str(sys.argv[1]) == "-c" or str(sys.argv[1]) == "--config"):
         # loading config.json
         file = open(str(sys.argv[2]), "r")
     else:

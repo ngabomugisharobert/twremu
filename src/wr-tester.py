@@ -33,7 +33,7 @@ def itemLoader():
 
 def configLoader():
 
-    if len(sys.argv) == 3 and str(sys.argv[1]) == "-config":
+    if len(sys.argv) == 3 and (str(sys.argv[1]) == "--config" or str(sys.argv[1]) == "-c"):
         # loading config.json
         file = open(str(sys.argv[2]), "r")
     else:
@@ -139,7 +139,7 @@ def forward(x, nextSeqNbr):
     msgdtl["UtcTimeStamp"] = ts
 
     for key in x.keys():
-        if key in ("ItemCode", "StationSequenceNumber"):
+        if key in ("ItemCode", "StationSequenceNumber", "SequenceNumber"):
             continue
 
         if "IsIdentification" not in station or station["IsIdentification"] == False:
@@ -290,6 +290,13 @@ def printReply(reply):
     if("InfoString" in reply["SignalData"] and str(reply["SignalData"]["InfoString"]) != ""):
         print("          |  InfoString: " +
               str(reply["SignalData"]["InfoString"]))
+
+    for key in reply["SignalData"].keys():
+        if key in ("SignalCode", "ItemCode", "StationSequenceNumber", "TransactionResult", "InfoString", "ProcessCode"):
+            continue
+
+        print("          |  " + key + ": " + str(reply["SignalData"][key]))
+
     print()
 
 # The callback function gets called when MQ message is received

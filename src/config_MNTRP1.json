@@ -24,7 +24,8 @@
       "CommandDescription": "Wrapline identification of unit",
       "WorkflowVersionCode": "WRAPLINE_IDENT_RP1",
       "ResponseSignalCode": "MNT1_ID_RSP",
-      "IsIdentification": true
+      "IsIdentification": true,
+      "IsMeasuring": true
     },
     {
       "StationSequenceNumber": 2,
@@ -41,8 +42,7 @@
       "CommandCode": "WRAPLINE_REQUEST_W",
       "CommandDescription": "Wrapline measure of unit",
       "WorkflowVersionCode": "WRAPLINE_WEIGHT_REQ_RP1",
-      "ResponseSignalCode": "MNT1_WR_RSP",
-      "IsScaling": true
+      "ResponseSignalCode": "MNT1_WR_RSP"
     },
     {
       "StationSequenceNumber": 3,
