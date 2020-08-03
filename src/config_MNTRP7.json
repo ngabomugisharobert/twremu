@@ -1,0 +1,66 @@
+{
+  "Rabbitmq": {
+    "User": "guest",
+    "Password": "guest",
+    "Host": "localhost",
+    "Port": 5672,
+    "VirtualHost": "/"
+  },
+  "ProcessCode": "MNTRP7",
+  "WorkstationCode": "WS-RWR2",
+  "SleepDelay": 7,
+  "Reset": {
+      "SignalCode": "RWR2_RT",
+      "CommandCode": "WRAPLINE_RESET_W",
+      "CommandDescription": "Wrapline Reset",
+      "WorkflowVersionCode": "WRAPLINE_RESET_RP7",
+      "ResponseSignalCode": "RWR2_RT_RSP"
+  },
+  "Stations": [
+    {
+      "StationSequenceNumber": 1,
+      "SignalCode": "MNT1_ID",
+      "CommandCode": "WRAPLINE_IDENTIFY_W",
+      "CommandDescription": "Wrapline identification of unit",
+      "WorkflowVersionCode": "WRAPLINE_IDENT_RP7",
+      "ResponseSignalCode": "MNT1_ID_RSP",
+      "IsIdentification": true,
+      "IsMeasuring": true
+    },
+    {
+      "StationSequenceNumber": 2,
+      "SignalCode": "MNT1_SC",
+      "CommandCode": "WRAPLINE_MEASURE_W",
+      "CommandDescription": "Wrapline measure of unit",
+      "WorkflowVersionCode": "WRAPLINE_SCALE_RP7",
+      "ResponseSignalCode": "MNT1_SC_RSP",
+      "IsScaling": true
+    },
+    {
+      "StationSequenceNumber": 2,
+      "SignalCode": "MNT1_WR",
+      "CommandCode": "WRAPLINE_REQUEST_W",
+      "CommandDescription": "Wrapline measure of unit",
+      "WorkflowVersionCode": "WRAPLINE_WEIGHT_REQ_RP7",
+      "ResponseSignalCode": "MNT1_WR_RSP",
+      "IsScaling": true
+    },
+    {
+      "StationSequenceNumber": 3,
+      "SignalCode": "MNT1_LB",
+      "CommandCode": "WRAPLINE_LABEL_W",
+      "CommandDescription": "Wrapline wrap of unit",
+      "WorkflowVersionCode": "WRAPLINE_LABEL_RP7",
+      "ResponseSignalCode": "MNT1_LB_RSP"
+    },
+    {
+      "StationSequenceNumber": 4,
+      "SignalCode": "MNT1_EX",
+      "CommandCode": "WRAPLINE_EXIT_W",
+      "CommandDescription": "Wrapline exit of unit",
+      "WorkflowVersionCode": "WRAPLINE_EXIT_RP7",
+      "ResponseSignalCode": "MNT1_EX_RSP",
+      "IsActive": false
+    }
+  ]
+}
