@@ -1,15 +1,11 @@
 {
     "ItemCodes": [{
-            "ItemCode": "350000000000000224",
-            "ScaledNetWeight": 4000,
-            "MeasuredWidth": 1000,
-            "MeasuredDiameter": 1200,
-            "InfoString": "From Tester 1"
-        },
-        {
             "ItemCode": "350000000000000225",
-            "ScaledNetWeight": 4001,
-            "InfoString": "Tester Error 2"
+            "ScaledNetWeight": 1400,
+            "XMeasuredWidth": 123700,
+            "MeasuredDiameter": 669,
+            "InfoString": "From Tester 1",
+            "Relabel": 0
         }
     ]
 }

@@ -7,7 +7,7 @@
     "VirtualHost": "/"
   },
   "ProcessCode": "MNTRP1",
-  "WorkstationCode": "WS-RWR2",
+  "WorkstationCode": "45110101",
   "SleepDelay": 7,
   "Reset": {
       "SignalCode": "MNT1_RESET",
@@ -19,40 +19,38 @@
   "Stations": [
     {
       "StationSequenceNumber": 1,
-      "SignalCode": "MNT1_ID",
+      "SignalCode": "MNTRP1_ID",
       "CommandCode": "WRAPLINE_IDENTIFY_W",
       "CommandDescription": "Wrapline identification of unit",
       "WorkflowVersionCode": "WRAPLINE_IDENT_RP1",
-      "ResponseSignalCode": "MNT1_ID_RSP",
-      "ResponseErrorSignalCode": "MNT1_ID_ERR",
+      "ResponseSignalCode": "MNTRP1_ID_RSP",
       "IsIdentification": true,
       "IsMeasuring": true
     },
     {
       "StationSequenceNumber": 2,
-      "SignalCode": "MNT1_SC",
+      "SignalCode": "MNTRP1_SC",
       "CommandCode": "WRAPLINE_MEASURE_W",
       "CommandDescription": "Wrapline measure of unit",
       "WorkflowVersionCode": "WRAPLINE_SCALE_RP1",
-      "ResponseSignalCode": "MNT1_SC_RSP",
-      "ResponseErrorSignalCode": "MNT1_SC_ERR",
+      "ResponseSignalCode": "MNTRP1_SC_RSP",
       "IsScaling": true
     },
     {
       "StationSequenceNumber": 2,
-      "SignalCode": "MNT1_WR",
+      "SignalCode": "MNTRP1_WR",
       "CommandCode": "WRAPLINE_REQUEST_W",
       "CommandDescription": "Wrapline measure of unit",
       "WorkflowVersionCode": "WRAPLINE_WEIGHT_REQ_RP1",
-      "ResponseSignalCode": "MNT1_WR_RSP"
+      "ResponseSignalCode": "MNTRP1_WR_RSP"
     },
     {
       "StationSequenceNumber": 3,
-      "SignalCode": "MNT1_LB",
+      "SignalCode": "MNTRP1_LB",
       "CommandCode": "WRAPLINE_LABEL_W",
       "CommandDescription": "Wrapline wrap of unit",
       "WorkflowVersionCode": "WRAPLINE_LABEL_RP1",
-      "ResponseSignalCode": "MNT1_LB_RSP"
+      "ResponseSignalCode": "MNTRP1_LB_RSP"
     },
     {
       "StationSequenceNumber": 4,

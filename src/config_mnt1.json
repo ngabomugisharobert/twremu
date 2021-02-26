@@ -1,0 +1,66 @@
+{
+  "Rabbitmq": {
+    "User": "TIPS_DEV@TISSUEMES",
+    "Password": "xxx",
+    "Host": "194.137.216.128",
+    "Port": 59010,
+    "VirtualHost": "TIPS_DEV@TISSUEMES"
+  },
+  "ProcessCode": "TE-RWR2",
+  "WorkstationCode": "WS-RWR2",
+  "SleepDelay": 7,
+  "Reset": {
+      "SignalCode": "RWR2_RT",
+      "CommandCode": "WRAPLINE_EXIT_W",
+      "CommandDescription": "Wrapline Reset",
+      "WorkflowVersionCode": "WRAPLINE_RESET",
+      "ResponseSignalCode": "RWR2_RT_RSP",
+      "IsActive": false
+  },
+  "Stations": [
+    {
+      "StationSequenceNumber": 1,
+      "SignalCode": "RWR2_ID",
+      "CommandCode": "WRAPLINE_IDENTIFY_W",
+      "CommandDescription": "Wrapline identification of unit",
+      "WorkflowVersionCode": "WRAPLINE_IDENTIFY",
+      "ResponseSignalCode": "RWR2_ID_RSP",
+      "IsIdentification": true,
+      "IsMeasuring": true
+    },
+    {
+      "StationSequenceNumber": 2,
+      "SignalCode": "RWR2_ME",
+      "CommandCode": "WRAPLINE_MEASURE_W",
+      "CommandDescription": "Wrapline measure of unit",
+      "WorkflowVersionCode": "WRAPLINE_MEASURE",
+      "ResponseSignalCode": "RWR2_ME_RSP",
+      "IsScaling": true
+    },
+    {
+      "StationSequenceNumber": 3,
+      "SignalCode": "RWR2_WR",
+      "CommandCode": "WRAPLINE_WRAP_W",
+      "CommandDescription": "Wrapline wrap of unit",
+      "WorkflowVersionCode": "WRAPLINE_WRAP",
+      "ResponseSignalCode": "RWR2_WR_RSP"
+    },
+    {
+      "StationSequenceNumber": 4,
+      "SignalCode": "RWR2_LB",
+      "CommandCode": "WRAPLINE_LABEL_W",
+      "CommandDescription": "Wrapline label of unit",
+      "WorkflowVersionCode": "WRAPLINE_LABEL",
+      "ResponseSignalCode": "RWR2_LB_RSP"
+    },
+    {
+      "StationSequenceNumber": 5,
+      "SignalCode": "RWR2_EX",
+      "CommandCode": "WRAPLINE_EXIT_W",
+      "CommandDescription": "Wrapline exit of unit",
+      "WorkflowVersionCode": "WRAPLINE_EXIT",
+      "ResponseSignalCode": "RWR2_EX_RSP",
+      "IsActive": false
+    }
+  ]
+}

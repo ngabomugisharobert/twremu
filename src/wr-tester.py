@@ -105,6 +105,11 @@ def forward(x, nextSeqNbr):
     workflowVersionCode = propBase["WorkflowVersionCode"]
     responseSignalCode = propBase["ResponseSignalCode"]
 
+    responseErrorSignalCode = None
+
+    if "ResponseErrorSignalCode" in propBase: 
+        responseErrorSignalCode = propBase["ResponseErrorSignalCode"]
+
     rawConf = configLoader()
 
     # get attributes
@@ -134,6 +139,9 @@ def forward(x, nextSeqNbr):
     msgdtl["ProcessCode"] = proCode
     msgdtl["WorkstationCode"] = workStationCode
     hdrs["WorkstationCode"] = workStationCode
+
+    if responseErrorSignalCode != None:
+        msgdtl["SignalBody"]["ResponseErrorSignalCode"] = responseErrorSignalCode
 
     ts = time.time()
     msgdtl["UtcTimeStamp"] = ts
@@ -309,6 +317,10 @@ def callback(ch, method, properties, body):
 
     reply = json.loads(body)
     printReply(reply)
+
+    # check if this was an error signal
+    if(reply["SignalCode"].endswith("_ERR")):
+        return
 
     rawData = json.loads(configLoader())
     sleepTime = rawData["SleepDelay"]
